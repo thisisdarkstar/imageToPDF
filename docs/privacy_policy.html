@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Image to PDF</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-light: #EEF2FF;
+            --primary-dark: #3730A3;
+            --accent: #06B6D4;
+            --success: #10B981;
+            --bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+            --radius: 16px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #6366F1;
+                --primary-light: #1E1B4B;
+                --primary-dark: #4338CA;
+                --accent: #22D3EE;
+                --bg: #0B0F19;
+                --card-bg: #131B2E;
+                --text-main: #F1F5F9;
+                --text-muted: #94A3B8;
+                --border: #1E293B;
+                --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .app-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .effective-date {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .summary-box h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-list {
+            list-style: none;
+        }
+
+        .summary-list li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .summary-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 8px;
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+
+        h3 {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 18px 0 8px 0;
+            color: var(--text-main);
+        }
+
+        p {
+            margin-bottom: 14px;
+            color: var(--text-main);
+            font-size: 15px;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .permission-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 20px 0;
+            font-size: 14px;
+        }
+
+        .permission-table th, .permission-table td {
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            text-align: left;
+        }
+
+        .permission-table th {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .pill {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="app-badge">Privacy First • 100% On-Device</div>
+            <h1>Privacy Policy</h1>
+            <p class="effective-date">Application: <strong>Image to PDF</strong> | Last Updated: September 18, 2026</p>
+        </header>
+
+        <div class="summary-box">
+            <h2>🛡️ Summary of Our Privacy Philosophy</h2>
+            <ul class="summary-list">
+                <li><strong>Zero Data Collection:</strong> We do not collect, harvest, store, or transmit your photos, documents, or personal data.</li>
+                <li><strong>No Internet Permission:</strong> The app does not declare or request internet access (<code style="background:rgba(0,0,0,0.06);padding:2px 4px;border-radius:4px;">android.permission.INTERNET</code>). It is physically impossible for the app to send data to any remote server.</li>
+                <li><strong>100% Offline Processing:</strong> All image enhancements, binarization, reordering, and PDF rendering happen locally in device memory.</li>
+                <li><strong>Zero Analytics & Third-Party Trackers:</strong> No advertising SDKs, tracking pixels, or diagnostic beacons are present.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>1. Information We Collect</h2>
+            <p><strong>None.</strong> <em>Image to PDF</em> is built strictly under the principle of Zero Knowledge and Privacy by Design. We do not require account creation, registration, email signups, or personal identity information of any kind.</p>
+            <p>Your documents, images, filenames, metadata, and generated PDFs remain exclusively on your device and are never monitored or analyzed.</p>
+        </div>
+
+        <div class="card">
+            <h2>2. Device Permissions Used</h2>
+            <p>To provide core document scanning functionality, <em>Image to PDF</em> requests the minimum necessary permissions in compliance with Google Play's Principle of Least Privilege:</p>
+
+            <table class="permission-table">
+                <thead>
+                    <tr>
+                        <th>Permission</th>
+                        <th>Status</th>
+                        <th>Specific Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>android.permission.CAMERA</strong></td>
+                        <td><span class="pill">Optional</span></td>
+                        <td>Allows you to snap photos of paper documents, receipts, or notes directly within the app. Camera photos are processed in temporary local cache and never transmitted.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Storage Access</strong></td>
+                        <td><span class="pill">Scoped / PhotoPicker</span></td>
+                        <td>The app uses the standard Android System PhotoPicker to select images without requiring broad storage permissions. Generated PDFs are kept in your private app space or exported directly to the public <code style="background:rgba(0,0,0,0.06);padding:2px 4px;border-radius:4px;">Downloads/ImageToPDF/</code> directory via Android MediaStore.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>android.permission.INTERNET</strong></td>
+                        <td><span class="pill" style="color:#DC2626;background:rgba(220,38,38,0.12)">NOT REQUESTED</span></td>
+                        <td>The app operates completely offline with zero network connectivity.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>3. Google Play Data Safety Declaration</h2>
+            <p>In adherence to Google Play Console Data Safety requirements:</p>
+            <ul>
+                <li><strong>Data collected:</strong> "No" (The application does not collect user data).</li>
+                <li><strong>Data shared:</strong> "No" (The application does not share user data with any third party).</li>
+                <li><strong>Security practices:</strong> All data stays within Android's sandboxed local application storage.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>4. Third-Party Libraries & Services</h2>
+            <p>The application only utilizes official Google Jetpack AndroidX components and Coil for local memory bitmap decoding. No third-party ad networks, social logins, or behavioral analytics frameworks are integrated into this software.</p>
+        </div>
+
+        <div class="card">
+            <h2>5. Children's Privacy (COPPA & Families Policy)</h2>
+            <p>Because our application collects zero personal information from any user, it complies with the Children's Online Privacy Protection Act (COPPA) and Google Play Families policy. It is safe for all age demographics.</p>
+        </div>
+
+        <div class="card">
+            <h2>6. Data Retention and Deletion</h2>
+            <p>Since your documents and history exist solely on your physical device, you retain 100% control over them at all times:</p>
+            <ul>
+                <li>You can delete individual PDF records from the in-app History screen with a single tap.</li>
+                <li>Clearing app data or uninstalling the application removes all locally stored temporary files and preferences immediately.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>7. Contact Information</h2>
+            <p>If you have any questions, inquiries, or feedback regarding this Privacy Policy, please feel free to reach out:</p>
+            <p><strong>Developer Support:</strong> support@imagetopdf.app</p>
+            <p><strong>Website / Repository:</strong> https://github.com/example/imagetopdf</p>
+        </div>
+
+        <footer>
+            <p>© 2026 Image to PDF. All rights reserved. • Studio Quality • Private by Design</p>
+        </footer>
+    </div>
+</body>
+</html>

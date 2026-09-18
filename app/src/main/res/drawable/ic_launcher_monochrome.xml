@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <group
+        android:name="composition"
+        android:translateX="2.5">
+
+        <!-- Back Photo Card Silhouette -->
+        <group
+            android:name="card_photo"
+            android:pivotX="41"
+            android:pivotY="54"
+            android:rotation="-8">
+
+            <path
+                android:pathData="M31,32 L51,32 C54.3,32 57,34.7 57,38 L57,70 C57,73.3 54.3,76 51,76 L31,76 C27.7,76 25,73.3 25,70 L25,38 C25,34.7 27.7,32 31,32 Z"
+                android:fillColor="#80FFFFFF" />
+
+            <path
+                android:pathData="M48,39 A3.5,3.5 0 1 0 48,46 A3.5,3.5 0 1 0 48,39 Z"
+                android:fillColor="#FFFFFF" />
+
+            <path
+                android:pathData="M25,70 L34,57 C34.8,55.8 36.4,55.8 37.2,57 L47,71 C47.5,71.8 46.9,72.8 46,72.8 L25,72.8 Z"
+                android:fillColor="#40FFFFFF" />
+
+            <path
+                android:pathData="M34,73 L43,60 C43.8,58.8 45.4,58.8 46.2,60 L57,73 C57.3,73.4 57,74 56.5,74 L34,74 Z"
+                android:fillColor="#B3FFFFFF" />
+        </group>
+
+        <!-- Front Document Card Silhouette -->
+        <group
+            android:name="card_pdf"
+            android:pivotX="60"
+            android:pivotY="54"
+            android:rotation="6">
+
+            <!-- Card Body -->
+            <path
+                android:pathData="M50,32 L67,32 L76,41 L76,70 C76,73.3 73.3,76 70,76 L50,76 C46.7,76 44,73.3 44,70 L44,38 C44,34.7 46.7,32 50,32 Z"
+                android:fillColor="#FFFFFF" />
+
+            <!-- Fold Cutout -->
+            <path
+                android:pathData="M67,32 L67,41 L76,41 Z"
+                android:fillColor="#000000" />
+
+            <!-- PDF Pill Cutout -->
+            <path
+                android:pathData="M52,56 L68,56 C70.2,56 72,57.8 72,60 L72,66 C72,68.2 70.2,70 68,70 L52,70 C49.8,70 48,68.2 48,66 L48,60 C48,57.8 49.8,56 52,56 Z"
+                android:fillColor="#000000" />
+
+            <!-- White PDF Text Inside Cutout -->
+            <path
+                android:pathData="M52,59.5 L54.8,59.5 C55.9,59.5 56.6,60.1 56.6,61.1 C56.6,62.1 55.9,62.7 54.8,62.7 L53.4,62.7 L53.4,66.5 L52,66.5 Z M53.4,60.6 L53.4,61.6 L54.7,61.6 C55.2,61.6 55.5,61.3 55.5,61.1 C55.5,60.8 55.2,60.6 54.7,60.6 Z"
+                android:fillColor="#FFFFFF" />
+
+            <path
+                android:pathData="M58,59.5 L60.5,59.5 C62.2,59.5 63.3,60.8 63.3,63 C63.3,65.2 62.2,66.5 60.5,66.5 L58,66.5 Z M59.4,60.7 L59.4,65.3 L60.4,65.3 C61.4,65.3 62,64.4 62,63 C62,61.6 61.4,60.7 60.4,60.7 Z"
+                android:fillColor="#FFFFFF" />
+
+            <path
+                android:pathData="M65,59.5 L69.5,59.5 L69.5,60.7 L66.4,60.7 L66.4,62.4 L68.9,62.4 L68.9,63.6 L66.4,63.6 L66.4,66.5 L65,66.5 Z"
+                android:fillColor="#FFFFFF" />
+        </group>
+    </group>
+</vector>

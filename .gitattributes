@@ -1,0 +1,15 @@
+# Handle line endings automatically for all text files
+* text=auto
+
+# Ensure shell scripts always use LF
+gradlew text eol=lf
+
+# Binary files
+*.png binary
+*.webp binary
+*.jpg binary
+*.jpeg binary
+*.jar binary
+*.apk binary
+*.aab binary
+*.pdf binary
