@@ -22,21 +22,27 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.imagetopdf.model.DraftRecord
 import com.example.imagetopdf.model.PdfRecord
 import com.example.imagetopdf.ui.components.FilterSheet
 import com.example.imagetopdf.ui.components.PdfConfigDialog
@@ -83,10 +89,47 @@ fun ImageToPdfApp(
     val uiState by viewModel.uiState.collectAsState()
     val historyRecords by viewModel.historyRecords.collectAsState()
     val themeMode by viewModel.themeMode.collectAsState()
+    val drafts by viewModel.drafts.collectAsState()
 
     var showSplash by remember { mutableStateOf(true) }
     var showHistory by remember { mutableStateOf(false) }
-    var currentCameraUri by remember { mutableStateOf<Uri?>(null) }
+    // Saved so the captured photo survives configuration changes / process death (camera capture).
+    var currentCameraUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+
+    // ── Back-press handling ─────────────────────────────────────────────────
+    // On HOME screen: if there are images, ask Discard/Draft; else confirm exit.
+    BackHandler(enabled = !showSplash && !showHistory && !uiState.isReorderMode && uiState.previewPageIndex == null) {
+        if (uiState.pages.isNotEmpty()) {
+            viewModel.showDiscardDialog()
+        } else {
+            viewModel.showExitConfirmDialog()
+        }
+    }
+    // On HISTORY screen: back just closes it (already handled by onBack lambda)
+    BackHandler(enabled = showHistory) {
+        showHistory = false
+    }
+
+    // Returns to the Home screen: closes any dialogs, preview, reorder and history.
+    fun navigateHome() {
+        showSplash = false
+        showHistory = false
+        viewModel.closeSuccessDialog()
+        viewModel.closeConfigDialog()
+        viewModel.closePreview()
+        viewModel.toggleReorderMode()
+    }
+
+    // Pure "return to Home" — resets nav state, closes every overlay and clears
+    // the staged images so the user lands on a fresh Home screen.
+    fun goHome() {
+        showSplash = false
+        showHistory = false
+        viewModel.closeSuccessDialog()
+        viewModel.closeConfigDialog()
+        viewModel.closePreview()
+        viewModel.clearAllPages()
+    }
 
     // Multi-select / Single-select PhotoPicker
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -186,7 +229,7 @@ fun ImageToPdfApp(
         }
     }
 
-    fun savePdfToDownloads(record: PdfRecord) {
+    fun performSaveToDownloads(record: PdfRecord) {
         val sourceFile = File(record.filePath)
         if (!sourceFile.exists()) {
             Toast.makeText(context, "PDF file does not exist", Toast.LENGTH_SHORT).show()
@@ -220,6 +263,35 @@ fun ImageToPdfApp(
         } catch (e: Exception) {
             Toast.makeText(context, "Error saving to Downloads: ${e.localizedMessage ?: e.message}", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    // Pending record for the legacy-storage permission request on API 28 and below
+    var pendingSaveRecord by remember { mutableStateOf<PdfRecord?>(null) }
+    val storagePermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        val pending = pendingSaveRecord
+        pendingSaveRecord = null
+        if (isGranted && pending != null) {
+            performSaveToDownloads(pending)
+        } else if (pending != null) {
+            Toast.makeText(context, "Storage permission is required to save to Downloads", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    fun savePdfToDownloads(record: PdfRecord) {
+        // On API 28 and below, WRITE_EXTERNAL_STORAGE may be revoked — request it first
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            val granted = ContextCompat.checkSelfPermission(
+                context, Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!granted) {
+                pendingSaveRecord = record
+                storagePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                return
+            }
+        }
+        performSaveToDownloads(record)
     }
 
     fun printPdf(record: PdfRecord) {
@@ -399,6 +471,7 @@ fun ImageToPdfApp(
                             historyCount = historyRecords.size,
                             documentOrientation = uiState.pdfConfig.orientation,
                             themeMode = themeMode,
+                            drafts = drafts,
                             onToggleTheme = { viewModel.toggleTheme() },
                             onSetThemeMode = { viewModel.setThemeMode(it) },
                             onToggleOrientation = { viewModel.setDocumentOrientation(it) },
@@ -420,7 +493,9 @@ fun ImageToPdfApp(
                             onReorderClick = { viewModel.toggleReorderMode() },
                             onClearAll = { viewModel.clearAllPages() },
                             onOpenHistory = { showHistory = true },
-                            onConvertClick = { viewModel.openConfigDialog() }
+                            onConvertClick = { viewModel.openConfigDialog() },
+                            onLoadDraft = { viewModel.loadDraft(it) },
+                            onDeleteDraft = { viewModel.deleteDraft(it) }
                         )
                     }
                 }
@@ -466,6 +541,10 @@ fun ImageToPdfApp(
                     onSharePdf = { sharePdf(it) },
                     onSaveToDownloads = { savePdfToDownloads(it) },
                     onPrintPdf = { printPdf(it) },
+                    onDone = {
+                        viewModel.closeSuccessDialog()
+                        goHome()
+                    },
                     onDismiss = { viewModel.closeSuccessDialog() }
                 )
             }
@@ -474,6 +553,51 @@ fun ImageToPdfApp(
             if (uiState.errorMessage != null) {
                 Toast.makeText(context, uiState.errorMessage, Toast.LENGTH_LONG).show()
                 viewModel.clearError()
+            }
+
+            // ── Discard / Save Draft / Cancel dialog ────────────────────────
+            if (uiState.showDiscardDialog) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.dismissDiscardDialog() },
+                    title = { Text("Unsaved Images") },
+                    text = { Text("You have ${uiState.pages.size} image${if (uiState.pages.size == 1) "" else "s"} ready to convert. Save as draft to continue later?") },
+                    confirmButton = {
+                        TextButton(onClick = { viewModel.saveDraft() }) {
+                            Text("Save Draft")
+                        }
+                    },
+                    dismissButton = {
+                        // Two dismiss-style actions: Discard (destructive) + Cancel
+                        androidx.compose.foundation.layout.Row {
+                            TextButton(onClick = { viewModel.discardAllPages() }) {
+                                Text("Discard", color = MaterialTheme.colorScheme.error)
+                            }
+                            TextButton(onClick = { viewModel.dismissDiscardDialog() }) {
+                                Text("Cancel")
+                            }
+                        }
+                    }
+                )
+            }
+
+            // ── Exit confirmation dialog ────────────────────────────────────
+            if (uiState.showExitConfirmDialog) {
+                val activity = (context as? android.app.Activity)
+                AlertDialog(
+                    onDismissRequest = { viewModel.dismissExitConfirmDialog() },
+                    title = { Text("Exit App?") },
+                    text = { Text("Are you sure you want to exit ImageToPdf free?") },
+                    confirmButton = {
+                        TextButton(onClick = { activity?.finish() }) {
+                            Text("Exit")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { viewModel.dismissExitConfirmDialog() }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
             }
         }
     }

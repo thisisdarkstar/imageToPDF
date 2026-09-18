@@ -88,3 +88,22 @@ data class PdfRecord(
     val pageCount: Int,
     val createdAt: Long = System.currentTimeMillis()
 )
+
+/**
+ * A saved draft — a named snapshot of the current image selection
+ * that can be resumed later from the Home screen.
+ */
+data class DraftRecord(
+    val id: String = UUID.randomUUID().toString(),
+    val name: String,
+    /** Uri.toString() for each page — stored as plain strings */
+    val pageUris: List<String>,
+    /** Rotation in degrees for each page, parallel to pageUris */
+    val pageRotations: List<Int>,
+    /** FilterType.name for each page, parallel to pageUris */
+    val pageFilters: List<String>,
+    val savedAt: Long = System.currentTimeMillis()
+) {
+    /** Convenience — number of images in this draft */
+    val imageCount: Int get() = pageUris.size
+}

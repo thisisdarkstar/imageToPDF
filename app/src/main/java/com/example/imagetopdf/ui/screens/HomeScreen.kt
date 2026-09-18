@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Drafts
 import androidx.compose.material.icons.filled.FilterVintage
 import androidx.compose.material.icons.filled.HighQuality
 import androidx.compose.material.icons.filled.History
@@ -51,14 +53,20 @@ import androidx.compose.material.icons.filled.StayCurrentPortrait
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.filled.BrightnessAuto
 import androidx.compose.material.icons.filled.DarkMode
@@ -89,7 +97,6 @@ import androidx.compose.runtime.setValue
 import com.example.imagetopdf.theme.MoonIndigo
 import com.example.imagetopdf.theme.SunAmber
 import com.example.imagetopdf.theme.ThemeMode
-import com.example.imagetopdf.ui.components.AboutAndPrivacyDialog
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -99,14 +106,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.imagetopdf.R
+import com.example.imagetopdf.model.DraftRecord
 import com.example.imagetopdf.model.FilterType
 import com.example.imagetopdf.model.PageItem
 import com.example.imagetopdf.model.PageOrientation
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
@@ -137,7 +150,10 @@ fun HomeScreen(
     onReorderClick: () -> Unit,
     onClearAll: () -> Unit,
     onOpenHistory: () -> Unit,
-    onConvertClick: () -> Unit
+    onConvertClick: () -> Unit,
+    drafts: List<DraftRecord> = emptyList(),
+    onLoadDraft: (DraftRecord) -> Unit = {},
+    onDeleteDraft: (DraftRecord) -> Unit = {}
 ) {
     val isDark = when (themeMode) {
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
@@ -214,11 +230,10 @@ fun HomeScreen(
                                         ),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(
-                                        Icons.Default.PictureAsPdf,
+                                    Image(
+                                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
                                         contentDescription = null,
-                                        tint = Color.White,
-                                        modifier = Modifier.size(20.dp)
+                                        modifier = Modifier.size(30.dp)
                                     )
                                 }
                                 Spacer(modifier = Modifier.width(10.dp))
@@ -347,54 +362,85 @@ fun HomeScreen(
         },
         bottomBar = {
             if (pages.isNotEmpty()) {
-                Surface(
-                    color = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 8.dp,
-                    shadowElevation = 8.dp,
-                    modifier = Modifier.fillMaxWidth()
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    Surface(
+                        color = MaterialTheme.colorScheme.surface,
+                        tonalElevation = 8.dp,
+                        shadowElevation = 12.dp,
+                        shape = RoundedCornerShape(18.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column {
-                            Text(
-                                text = "${pages.size} Page${if (pages.size > 1) "s" else ""}",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = "High-Fidelity Output",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-
-                        Button(
-                            onClick = onConvertClick,
+                        Row(
                             modifier = Modifier
-                                .height(48.dp)
-                                .width(180.dp),
-                            shape = RoundedCornerShape(14.dp)
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Icon(Icons.Default.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Build PDF", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Column {
+                                Text(
+                                    text = "${pages.size} Page${if (pages.size > 1) "s" else ""}",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = "High-Fidelity Output",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+
+                            Button(
+                                onClick = onConvertClick,
+                                modifier = Modifier
+                                    .height(48.dp)
+                                    .width(180.dp),
+                                shape = RoundedCornerShape(14.dp)
+                            ) {
+                                Icon(Icons.Default.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Build PDF", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            }
                         }
                     }
                 }
             }
         }
-    ) { paddingValues ->
-        if (pages.isEmpty()) {
+                    ) { paddingValues ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues)
+                        ) {
+                        AnimatedContent(
+                            targetState = pages.isEmpty(),
+                            transitionSpec = {
+                                if (targetState) {
+                                    // Going from grid -> empty home: fade out the grid, fade in the fresh Home
+                                    (fadeIn(animationSpec = tween(350)) + scaleIn(initialScale = 0.96f, animationSpec = tween(350)))
+                                        .togetherWith(fadeOut(animationSpec = tween(250)) + scaleOut(targetScale = 1.04f, animationSpec = tween(250)))
+                                } else {
+                                    // Going from empty home -> grid: subtle slide + fade for new content
+                                    (fadeIn(animationSpec = tween(300)) + slideInHorizontally(animationSpec = tween(300)) { it / 12 })
+                                        .togetherWith(fadeOut(animationSpec = tween(200)) + slideOutHorizontally(animationSpec = tween(200)) { -it / 24 })
+                                }
+                            },
+                            label = "homeContentTransition"
+                        ) { isEmpty ->
+                        if (isEmpty) {
             EmptyHomeContent(
                 paddingValues = paddingValues,
                 onCamera = onLaunchCamera,
                 onGallery = onLaunchGallery,
-                onOpenHistory = onOpenHistory
+                onOpenHistory = onOpenHistory,
+                drafts = drafts,
+                onLoadDraft = onLoadDraft,
+                onDeleteDraft = onDeleteDraft
             )
         } else {
             LazyVerticalGrid(
@@ -402,7 +448,7 @@ fun HomeScreen(
                 contentPadding = PaddingValues(
                     start = 14.dp,
                     end = 14.dp,
-                    top = paddingValues.calculateTopPadding() + 8.dp,
+                    top = 8.dp,
                     bottom = paddingValues.calculateBottomPadding() + 80.dp
                 ),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -415,8 +461,6 @@ fun HomeScreen(
                         pageCount = pages.size,
                         documentOrientation = documentOrientation,
                         onToggleOrientation = onToggleOrientation,
-                        onAddCamera = onLaunchCamera,
-                        onAddGallery = onLaunchGallery,
                         onFilterAll = onFilterAll,
                         onRotateAll = onRotateAll,
                         onReorder = onReorderClick
@@ -451,7 +495,50 @@ fun HomeScreen(
                 }
             }
         }
+            }
+
+        // Stacked Camera + Gallery floats (only when images are selected)
+        AnimatedVisibility(
+            visible = pages.isNotEmpty(),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 14.dp, bottom = 6.dp),
+            enter = fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.8f, animationSpec = tween(300)),
+            exit = fadeOut(animationSpec = tween(200)) + scaleOut(targetScale = 0.8f, animationSpec = tween(200))
+        ) {
+            Column(
+                modifier = Modifier,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                Surface(
+                    onClick = onLaunchCamera,
+                    modifier = Modifier.size(58.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    shadowElevation = 6.dp
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.CameraAlt, contentDescription = "Add from camera", modifier = Modifier.size(30.dp))
+                    }
+                }
+                Surface(
+                    onClick = onLaunchGallery,
+                    modifier = Modifier.size(58.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                    shadowElevation = 6.dp
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.AddPhotoAlternate, contentDescription = "Add from gallery", modifier = Modifier.size(30.dp))
+                    }
+                }
+            }
+        }
     }
+}
 }
 
 @Composable
@@ -459,111 +546,118 @@ fun EmptyHomeContent(
     paddingValues: PaddingValues,
     onCamera: () -> Unit,
     onGallery: () -> Unit,
-    onOpenHistory: () -> Unit
+    onOpenHistory: () -> Unit,
+    drafts: List<DraftRecord> = emptyList(),
+    onLoadDraft: (DraftRecord) -> Unit = {},
+    onDeleteDraft: (DraftRecord) -> Unit = {}
 ) {
-    Column(
+    androidx.compose.foundation.lazy.LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues)
             .padding(horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        // Hero Visual Card
-        Card(
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
-            ),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+            // Hero Visual Card
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+                ),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(68.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary),
-                    contentAlignment = Alignment.Center
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(
-                        Icons.Default.PictureAsPdf,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(36.dp)
+                    Box(
+                        modifier = Modifier
+                            .size(68.dp)
+                            .clip(CircleShape)
+                            .background(
+                                Brush.linearGradient(
+                                    listOf(
+                                        MaterialTheme.colorScheme.primary,
+                                        MaterialTheme.colorScheme.tertiary
+                                    )
+                                )
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                            contentDescription = null,
+                            modifier = Modifier.size(56.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Turn Photos into Clean PDFs",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "Capture physical documents or import gallery photos. Rendered locally on your device with complete privacy.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 20.sp,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Turn Photos into Clean PDFs",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                    text = "Capture physical documents or import gallery photos. Rendered locally on your device with complete privacy.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 20.sp,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
             }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Big Primary Action Buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            // Camera Button
-            Button(
-                onClick = onCamera,
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .weight(1f)
-                    .height(64.dp)
+            Spacer(modifier = Modifier.height(24.dp))
+            // Big Primary Action Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(22.dp))
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text("Scan Document", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Button(
+                    onClick = onCamera,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.weight(1f).height(64.dp)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(22.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text("Scan Document", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    }
+                }
+                FilledTonalButton(
+                    onClick = onGallery,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.weight(1f).height(64.dp)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Default.PhotoLibrary, contentDescription = null, modifier = Modifier.size(22.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text("Import Photos", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    }
                 }
             }
-
-            // Gallery Button
-            FilledTonalButton(
-                onClick = onGallery,
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .weight(1f)
-                    .height(64.dp)
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.PhotoLibrary, contentDescription = null, modifier = Modifier.size(22.dp))
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text("Import Photos", fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                }
-            }
+            Spacer(modifier = Modifier.height(24.dp))
+            FeaturePill(icon = Icons.Default.HighQuality, title = "Lossless Clarity", desc = "Preserves every detail at full sensor resolution")
+            Spacer(modifier = Modifier.height(8.dp))
+            FeaturePill(icon = Icons.Default.FilterVintage, title = "Document Filters", desc = "Crisp B&W binarization, grayscale & magic tone boost")
+            Spacer(modifier = Modifier.height(8.dp))
+            FeaturePill(icon = Icons.Default.SwapVert, title = "Seamless Reordering", desc = "Rearrange, duplicate, or rotate pages on the fly")
+            Spacer(modifier = Modifier.height(8.dp))
+            FeaturePill(icon = Icons.Default.Security, title = "Private by Design", desc = "Zero cloud, zero uploads — entirely on your device")
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Feature Highlights Pills
-        FeaturePill(icon = Icons.Default.HighQuality, title = "Lossless Clarity", desc = "Preserves every detail at full sensor resolution")
-        Spacer(modifier = Modifier.height(8.dp))
-        FeaturePill(icon = Icons.Default.FilterVintage, title = "Document Filters", desc = "Crisp B&W binarization, grayscale & magic tone boost")
-        Spacer(modifier = Modifier.height(8.dp))
-        FeaturePill(icon = Icons.Default.SwapVert, title = "Seamless Reordering", desc = "Rearrange, duplicate, or rotate pages on the fly")
-        Spacer(modifier = Modifier.height(8.dp))
-        FeaturePill(icon = Icons.Default.Security, title = "Private by Design", desc = "Zero cloud, zero uploads — entirely on your device")
+        // Drafts section — only shown when drafts exist
+        if (drafts.isNotEmpty()) {
+            item {
+                Spacer(modifier = Modifier.height(28.dp))
+                DraftListSection(
+                    drafts = drafts,
+                    onLoadDraft = onLoadDraft,
+                    onDeleteDraft = onDeleteDraft
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
     }
 }
 
@@ -615,8 +709,6 @@ fun StagingToolbar(
     pageCount: Int,
     documentOrientation: PageOrientation,
     onToggleOrientation: (PageOrientation) -> Unit,
-    onAddCamera: () -> Unit,
-    onAddGallery: () -> Unit,
     onFilterAll: () -> Unit,
     onRotateAll: () -> Unit,
     onReorder: () -> Unit
@@ -637,28 +729,6 @@ fun StagingToolbar(
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )
-
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilledTonalButton(
-                        onClick = onAddCamera,
-                        shape = RoundedCornerShape(10.dp),
-                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
-                    ) {
-                        Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Camera", fontSize = 12.sp)
-                    }
-
-                    FilledTonalButton(
-                        onClick = onAddGallery,
-                        shape = RoundedCornerShape(10.dp),
-                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
-                    ) {
-                        Icon(Icons.Default.AddPhotoAlternate, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Gallery", fontSize = 12.sp)
-                    }
-                }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -940,6 +1010,143 @@ fun PageGridCard(
                     modifier = Modifier.size(28.dp)
                 ) {
                     Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Move Right", modifier = Modifier.size(14.dp))
+                }
+            }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Drafts section
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Composable
+fun DraftListSection(
+    drafts: List<DraftRecord>,
+    onLoadDraft: (DraftRecord) -> Unit,
+    onDeleteDraft: (DraftRecord) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Icon(
+                    Icons.Default.Drafts,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = "Saved Drafts",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Surface(
+                shape = RoundedCornerShape(50),
+                color = MaterialTheme.colorScheme.primaryContainer
+            ) {
+                Text(
+                    text = "${drafts.size}",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        drafts.forEach { draft ->
+            DraftCard(
+                draft = draft,
+                onLoad = { onLoadDraft(draft) },
+                onDelete = { onDeleteDraft(draft) }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
+
+@Composable
+fun DraftCard(
+    draft: DraftRecord,
+    onLoad: () -> Unit,
+    onDelete: () -> Unit
+) {
+    val dateStr = remember(draft.savedAt) {
+        SimpleDateFormat("MMM d, h:mm a", Locale.getDefault()).format(Date(draft.savedAt))
+    }
+    val imageWord = if (draft.imageCount == 1) "image" else "images"
+
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Default.Drafts,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "${draft.imageCount} $imageWord ready",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = dateStr,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FilledTonalButton(
+                    onClick = onLoad,
+                    shape = RoundedCornerShape(10.dp),
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)
+                ) {
+                    Text("Resume", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                }
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Delete draft",
+                        tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
         }

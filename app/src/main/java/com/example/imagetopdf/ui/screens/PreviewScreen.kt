@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -58,6 +59,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -76,6 +78,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.imagetopdf.engine.ImageFilterEngine
+import com.example.imagetopdf.engine.PdfMath
 import com.example.imagetopdf.model.FilterType
 import com.example.imagetopdf.model.PageItem
 import com.example.imagetopdf.model.PageOrientation
@@ -302,7 +306,7 @@ fun PreviewScreen(
                     // Zoom Out
                     FilledTonalIconButton(
                         onClick = {
-                            val newScale = (currentPage.scale - 0.15f).coerceIn(0.5f, 4.0f)
+                            val newScale = (currentPage.scale - 0.15f).coerceIn(PdfMath.SCALE_MIN, PdfMath.SCALE_MAX)
                             onUpdateTransform(currentPage.id, newScale, currentPage.panOffsetX, currentPage.panOffsetY, false)
                         },
                         modifier = Modifier.size(34.dp)
@@ -322,7 +326,7 @@ fun PreviewScreen(
                     // Zoom In
                     FilledTonalIconButton(
                         onClick = {
-                            val newScale = (currentPage.scale + 0.15f).coerceIn(0.5f, 4.0f)
+                            val newScale = (currentPage.scale + 0.15f).coerceIn(PdfMath.SCALE_MIN, PdfMath.SCALE_MAX)
                             onUpdateTransform(currentPage.id, newScale, currentPage.panOffsetX, currentPage.panOffsetY, false)
                         },
                         modifier = Modifier.size(34.dp)
@@ -364,7 +368,7 @@ fun PreviewScreen(
                     // Left
                     FilledTonalIconButton(
                         onClick = {
-                            val newPanX = (currentPage.panOffsetX - 0.12f).coerceIn(-1.5f, 1.5f)
+                            val newPanX = (currentPage.panOffsetX - 0.12f).coerceIn(PdfMath.PAN_MIN, PdfMath.PAN_MAX)
                             onUpdateTransform(currentPage.id, currentPage.scale, newPanX, currentPage.panOffsetY, false)
                         },
                         modifier = Modifier.size(30.dp)
@@ -376,7 +380,7 @@ fun PreviewScreen(
                     // Up
                     FilledTonalIconButton(
                         onClick = {
-                            val newPanY = (currentPage.panOffsetY - 0.12f).coerceIn(-1.5f, 1.5f)
+                            val newPanY = (currentPage.panOffsetY - 0.12f).coerceIn(PdfMath.PAN_MIN, PdfMath.PAN_MAX)
                             onUpdateTransform(currentPage.id, currentPage.scale, currentPage.panOffsetX, newPanY, false)
                         },
                         modifier = Modifier.size(30.dp)
@@ -388,7 +392,7 @@ fun PreviewScreen(
                     // Down
                     FilledTonalIconButton(
                         onClick = {
-                            val newPanY = (currentPage.panOffsetY + 0.12f).coerceIn(-1.5f, 1.5f)
+                            val newPanY = (currentPage.panOffsetY + 0.12f).coerceIn(PdfMath.PAN_MIN, PdfMath.PAN_MAX)
                             onUpdateTransform(currentPage.id, currentPage.scale, currentPage.panOffsetX, newPanY, false)
                         },
                         modifier = Modifier.size(30.dp)
@@ -400,7 +404,7 @@ fun PreviewScreen(
                     // Right
                     FilledTonalIconButton(
                         onClick = {
-                            val newPanX = (currentPage.panOffsetX + 0.12f).coerceIn(-1.5f, 1.5f)
+                            val newPanX = (currentPage.panOffsetX + 0.12f).coerceIn(PdfMath.PAN_MIN, PdfMath.PAN_MAX)
                             onUpdateTransform(currentPage.id, currentPage.scale, newPanX, currentPage.panOffsetY, false)
                         },
                         modifier = Modifier.size(30.dp)
@@ -425,7 +429,9 @@ fun PreviewScreen(
         // Bottom Thumbnail Strip
         Surface(
             color = Color(0xFF141414),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
         ) {
             Column(
                 modifier = Modifier
@@ -473,6 +479,10 @@ fun PageSheetEditor(
         getColorFilterForFilterType(pageItem.filterType)
     }
 
+    // Always observe the latest values inside the gesture handler without restarting it
+    val pageItemState = rememberUpdatedState(pageItem)
+    val onTransformChangedState = rememberUpdatedState(onTransformChanged)
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -497,15 +507,20 @@ fun PageSheetEditor(
                 modifier = Modifier
                     .fillMaxSize()
                     .clipToBounds() // Ensure image never overflows the page boundary!
-                    .pointerInput(pageItem.id, pageItem.scale, pageItem.panOffsetX, pageItem.panOffsetY) {
+                    .pointerInput(pageItem.id) {
                         detectTransformGestures(panZoomLock = false) { _, pan, zoom, _ ->
-                            val newScale = if (zoom != 1f) (pageItem.scale * zoom).coerceIn(0.5f, 4.0f) else pageItem.scale
+                            val current = pageItemState.value
+                            val newScale = if (zoom != 1f) {
+                                (current.scale * zoom).coerceIn(PdfMath.SCALE_MIN, PdfMath.SCALE_MAX)
+                            } else {
+                                current.scale
+                            }
                             // Pan relative to sheet dimensions
-                            val panDeltaX = pan.x / (availableWidthPx * 0.35f)
-                            val panDeltaY = pan.y / (availableHeightPx * 0.35f)
-                            val newPanX = (pageItem.panOffsetX + panDeltaX).coerceIn(-1.5f, 1.5f)
-                            val newPanY = (pageItem.panOffsetY + panDeltaY).coerceIn(-1.5f, 1.5f)
-                            onTransformChanged(newScale, newPanX, newPanY, false)
+                            val panDeltaX = pan.x / (availableWidthPx * 0.5f)
+                            val panDeltaY = pan.y / (availableHeightPx * 0.5f)
+                            val newPanX = (current.panOffsetX + panDeltaX).coerceIn(PdfMath.PAN_MIN, PdfMath.PAN_MAX)
+                            val newPanY = (current.panOffsetY + panDeltaY).coerceIn(PdfMath.PAN_MIN, PdfMath.PAN_MAX)
+                            onTransformChangedState.value(newScale, newPanX, newPanY, false)
                         }
                     },
                 contentAlignment = Alignment.Center
@@ -532,8 +547,8 @@ fun PageSheetEditor(
                             .graphicsLayer(
                                 scaleX = if (pageItem.fillPage) 1f else pageItem.scale,
                                 scaleY = if (pageItem.fillPage) 1f else pageItem.scale,
-                                translationX = pageItem.panOffsetX * (availableWidthPx * 0.25f),
-                                translationY = pageItem.panOffsetY * (availableHeightPx * 0.25f),
+                                translationX = pageItem.panOffsetX * (availableWidthPx * 0.5f),
+                                translationY = pageItem.panOffsetY * (availableHeightPx * 0.5f),
                                 rotationZ = pageItem.rotation.toFloat()
                             )
                     )
@@ -606,53 +621,5 @@ fun ThumbnailItem(
     }
 }
 
-fun getColorFilterForFilterType(filterType: FilterType): ColorFilter? {
-    return when (filterType) {
-        FilterType.ORIGINAL -> null
-        FilterType.GRAYSCALE -> {
-            val cm = ColorMatrix().apply { setToSaturation(0f) }
-            ColorFilter.colorMatrix(cm)
-        }
-        FilterType.BW_DOCUMENT -> {
-            val androidGray = android.graphics.ColorMatrix().apply { setSaturation(0f) }
-            val contrast = 3.2f
-            val translate = (-128f * (contrast - 1f)) + 30f
-            val androidContrast = android.graphics.ColorMatrix(
-                floatArrayOf(
-                    contrast, 0f, 0f, 0f, translate,
-                    0f, contrast, 0f, 0f, translate,
-                    0f, 0f, contrast, 0f, translate,
-                    0f, 0f, 0f, 1f, 0f
-                )
-            )
-            androidContrast.preConcat(androidGray)
-            ColorFilter.colorMatrix(ColorMatrix(androidContrast.array))
-        }
-        FilterType.MAGIC_COLOR -> {
-            val androidSat = android.graphics.ColorMatrix().apply { setSaturation(1.30f) }
-            val contrast = 1.25f
-            val translate = (-128f * (contrast - 1f)) + 12f
-            val androidContrast = android.graphics.ColorMatrix(
-                floatArrayOf(
-                    contrast, 0f, 0f, 0f, translate,
-                    0f, contrast, 0f, 0f, translate,
-                    0f, 0f, contrast, 0f, translate,
-                    0f, 0f, 0f, 1f, 0f
-                )
-            )
-            androidContrast.preConcat(androidSat)
-            ColorFilter.colorMatrix(ColorMatrix(androidContrast.array))
-        }
-        FilterType.SEPIA -> {
-            val cm = ColorMatrix(
-                floatArrayOf(
-                    0.393f, 0.769f, 0.189f, 0f, 0f,
-                    0.349f, 0.686f, 0.168f, 0f, 0f,
-                    0.272f, 0.534f, 0.131f, 0f, 0f,
-                    0f, 0f, 0f, 1f, 0f
-                )
-            )
-            ColorFilter.colorMatrix(cm)
-        }
-    }
-}
+fun getColorFilterForFilterType(filterType: FilterType): ColorFilter? =
+    ImageFilterEngine.colorMatrixArrayFor(filterType)?.let { ColorFilter.colorMatrix(ColorMatrix(it)) }

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to PDF — Convert Photos to PDF on Android</title>
+    <meta name="description" content="Image to PDF — a 100% offline, privacy-first Android app that converts photos and scans into crisp PDF documents. No ads, no tracking, no internet access.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-light: #EEF2FF;
+            --primary-dark: #3730A3;
+            --accent: #06B6D4;
+            --success: #10B981;
+            --bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+            --radius: 16px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #6366F1;
+                --primary-light: #1E1B4B;
+                --primary-dark: #4338CA;
+                --accent: #22D3EE;
+                --bg: #0B0F19;
+                --card-bg: #131B2E;
+                --text-main: #F1F5F9;
+                --text-muted: #94A3B8;
+                --border: #1E293B;
+                --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 960px; margin: 0 auto; }
+
+        header { text-align: center; margin-bottom: 48px; }
+
+        .hero-banner {
+            display: block;
+            width: 100%;
+            max-width: 1024px;
+            margin: 0 auto 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+            margin-bottom: 12px;
+        }
+
+        .tagline {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 640px;
+            margin: 0 auto 24px;
+        }
+
+        .badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .badge.green { color: var(--success); }
+        .badge.indigo { color: var(--primary); }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+
+        p { margin-bottom: 14px; color: var(--text-main); font-size: 15px; }
+
+        .hero-box {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .feature {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .feature h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--primary); }
+        .feature p { font-size: 14px; color: var(--text-muted); margin: 0; }
+
+        .screenshots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .screenshot {
+            background: #0F172A;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .screenshot img {
+            width: 100%;
+            display: block;
+            aspect-ratio: 9 / 16;
+            object-fit: contain;
+        }
+        .screenshot p { font-size: 12px; color: var(--text-muted); text-align: center; padding: 8px; margin: 0; }
+
+        .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 15px;
+            text-decoration: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .btn-primary { background: var(--primary); color: #FFFFFF; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { background: transparent; color: var(--primary); border-color: var(--primary); }
+        .btn-outline:hover { background: var(--primary-light); }
+
+        .download-notes { font-size: 13px; color: var(--text-muted); margin-top: 12px; }
+
+        ul { padding-left: 20px; margin-bottom: 16px; }
+        li { margin-bottom: 8px; font-size: 15px; }
+
+        footer {
+            text-align: center;
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img class="hero-banner" src="assets/feature_graphic_1024x500.png" alt="Image to PDF — Studio Quality, Private by Design">
+        <header>
+            <h1>Image to PDF</h1>
+            <p class="tagline">Turn photos, receipts, and scans into crisp, crystal-clear PDF documents — entirely on your device. No internet, no ads, no tracking.</p>
+            <div class="badges">
+                <span class="badge indigo">Android 7.0+ (API 24)</span>
+                <span class="badge indigo">Jetpack Compose · Material 3</span>
+                <span class="badge green">100% Offline</span>
+                <span class="badge green">Zero Network</span>
+                <span class="badge">A4 · Letter · Fit to Image</span>
+            </div>
+        </header>
+
+        <div class="hero-box">
+            <h2 style="margin-top:0;">💡 What is Image to PDF?</h2>
+            <p><strong>Image to PDF</strong> is a modern, high-performance Android application that converts single or multi-page photos into PDF documents directly on your device. Everything — filtering, rotation, reordering, watermarking, and PDF rendering — happens locally in memory. The app <strong>does not declare the internet permission</strong>, so it cannot send your data anywhere, even in principle.</p>
+        </div>
+
+        <div class="card">
+            <h2>✨ Features</h2>
+            <div class="features">
+                <div class="feature">
+                    <h3>📸 Easy Ingestion</h3>
+                    <p>Multi-image Photo Picker, in-app camera capture, and batch selection from dozens of images at once.</p>
+                </div>
+                <div class="feature">
+                    <h3>💎 Lossless Rendering</h3>
+                    <p>Zero lossy downscaling. Quality presets: Ultra HD (100%), Balanced (85%), and Compact (65%).</p>
+                </div>
+                <div class="feature">
+                    <h3>🎨 Document Filters</h3>
+                    <p>Original, B&W Clean, Grayscale, Magic Color, and Sepia — with pinch-to-zoom, pan, and fit/fill crop.</p>
+                </div>
+                <div class="feature">
+                    <h3>📐 Page Layout</h3>
+                    <p>A4, US Letter, or exact Fit-to-Image sizes with Portrait, Landscape, and Auto orientation plus adjustable margins.</p>
+                </div>
+                <div class="feature">
+                    <h3>🛡️ Watermark Stamps</h3>
+                    <p>Native canvas-rendered CONFIDENTIAL, DRAFT, and custom stamps in diagonal (45°) or horizontal alignment.</p>
+                </div>
+                <div class="feature">
+                    <h3>🖨️ Export & Print</h3>
+                    <p>Save to Downloads, native Android printing, sharing, and an offline searchable document history.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📱 In Action</h2>
+            <div class="screenshots">
+                <div class="screenshot">
+                    <img src="assets/screenshots/splash_screen.png" alt="Animated splash screen">
+                    <p>Splash — studio branding</p>
+                </div>
+                <div class="screenshot">
+                    <img src="assets/screenshots/home_screen.png" alt="Home screen">
+                    <p>Home — start a new document</p>
+                </div>
+                <div class="screenshot">
+                    <img src="assets/screenshots/selected_screen.png" alt="Selected images in the staging grid">
+                    <p>Staging — batch-selected pages</p>
+                </div>
+                <div class="screenshot">
+                    <img src="assets/screenshots/preview_and_adjust.png" alt="Page preview and adjustment controls">
+                    <p>Preview — zoom, pan & rotate</p>
+                </div>
+                <div class="screenshot">
+                    <img src="assets/screenshots/filters.png" alt="Document filter sheet">
+                    <p>Filters — B&W, Sepia & more</p>
+                </div>
+                <div class="screenshot">
+                    <img src="assets/screenshots/pdf_save_options.png" alt="PDF export options">
+                    <p>Export — watermark, size & quality</p>
+                </div>
+                <div class="screenshot">
+                    <img src="assets/screenshots/saved_popup.png" alt="PDF saved confirmation">
+                    <p>Done — saved to Downloads</p>
+                </div>
+                <div class="screenshot">
+                    <img src="assets/screenshots/saved_history.png" alt="Document history screen">
+                    <p>History — offline search & sort</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🔒 Privacy & Security</h2>
+            <p>Image to PDF is engineered with an uncompromising privacy architecture:</p>
+            <ul>
+                <li><strong>No Internet Access</strong> — the <code>android.permission.INTERNET</code> permission is not declared in the manifest, making remote communication physically impossible.</li>
+                <li><strong>100% On-Device Processing</strong> — all image enhancement, binarization, layout, and PDF generation run in your device's local memory.</li>
+                <li><strong>Zero Analytics / Telemetry</strong> — no advertising SDKs, tracking pixels, or crash report beacons.</li>
+                <li><strong>Scoped Storage</strong> — modern MediaStore APIs; no broad external storage permissions required on Android 10+.</li>
+            </ul>
+            <p><a href="privacy_policy.html">Read the full Privacy Policy →</a></p>
+        </div>
+
+        <div class="card">
+            <h2>⬇️ Get the App</h2>
+            <p>No account required. Just install the APK and go — the app works fully offline from the first launch.</p>
+            <!--
+                Replace the two URLs below when you publish release builds.
+                Upload app/build/outputs/apk/release/app-release.apk as a GitHub Release.
+            -->
+            <div class="cta-row">
+                <a class="btn btn-primary" href="https://github.com/example/imagetopdf/releases/latest" target="_blank" rel="noopener">Download Release APK</a>
+                <a class="btn btn-outline" href="https://github.com/example/imagetopdf" target="_blank" rel="noopener">View Source & Build Guide</a>
+            </div>
+            <p class="download-notes">
+                Prefer to build it yourself? Follow the build guide in the repository's <strong>README</strong>
+                (<code>assembleDebug</code> / <code>assembleRelease</code>) — it takes about one command.
+            </p>
+        </div>
+
+        <footer>
+            <p>© 2026 Image to PDF. All rights reserved. · <a href="privacy_policy.html">Privacy Policy</a> · Licensed under Apache 2.0</p>
+        </footer>
+    </div>
+</body>
+</html>

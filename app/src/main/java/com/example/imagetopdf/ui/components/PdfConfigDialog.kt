@@ -311,11 +311,6 @@ fun PdfConfigDialog(
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
-                        Text(
-                            text = "Subtle 'Page X of Y' page numbers in footer",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
                     }
                 }
             }
@@ -345,11 +340,6 @@ fun PdfConfigDialog(
                                 text = "Document Watermark Stamp",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold
-                            )
-                            Text(
-                                text = "Overlays security or status stamp across all pages",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }

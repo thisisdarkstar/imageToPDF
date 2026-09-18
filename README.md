@@ -1,4 +1,4 @@
-# 📄 Image to PDF (Android)
+# <img src="docs/assets/icon_512.png" width="80" height="80" align="center" alt="icon"/> Image to PDF (Android)
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0+-7F52FF.svg?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
 [![Android](https://img.shields.io/badge/Platform-Android%207.0%2B%20(API%2024%2B)-3DDC84.svg?logo=android&logoColor=white)](https://developer.android.com)
@@ -124,36 +124,111 @@ com.example.imagetopdf
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Building & Releasing
+
+This guide covers compiling both the **debug** and **release** APKs from source, setting up a proper release signing keystore, running tests, and troubleshooting.
+
+> **Tip:** On Windows use `.\gradlew.bat`, on macOS/Linux use `./gradlew`. All paths below are relative to the project root.
 
 ### Prerequisites
-- **Android Studio**: Ladybug | Meerkat (or newer)
-- **JDK**: Java Development Kit 17
-- **Android SDK**: Build Tools 36, Platform API 36 (Minimum supported: Android 7.0 / API 24)
 
-### Building from Source
+| Requirement | Version / Note |
+|---|---|
+| **JDK** | Java Development Kit **17** (`JAVA_HOME` set, `java -version` shows 17) |
+| **Android SDK** | Platform **API 36** + **Build Tools 36** (via Android Studio SDK Manager) |
+| **Android Studio** | Ladybug / Meerkat or newer (optional — CLI-only builds work too) |
+| **SDK path** | Auto-detected by Android Studio, or set `sdk.dir=...` in `local.properties` |
 
-1. **Clone the Repository**:
+### 1. Debug APK (fast, unsigned-with-debug-key, **not** size-optimized)
+
+1. **Clone** the repository and open a terminal in the project root.
+2. **Build the debug APK**:
    ```bash
-   git clone https://github.com/your-username/imagetopdf.git
-   cd imagetopdf
+   ./gradlew assembleDebug        # macOS / Linux
+   .\gradlew.bat assembleDebug    # Windows
    ```
-
-2. **Assemble Debug APK**:
-   ```bash
-   ./gradlew assembleDebug
-   ```
-   The APK will be generated at `app/build/outputs/apk/debug/app-debug.apk`.
-
-3. **Run Unit Tests**:
-   ```bash
-   ./gradlew testDebugUnitTest
-   ```
-
-4. **Install on Connected Device or Emulator**:
+3. **Output**: `app/build/outputs/apk/debug/app-debug.apk` (~20 MB — includes Compose tooling, no R8 shrinking).
+4. **Install directly on a connected device / emulator**:
    ```bash
    ./gradlew installDebug
    ```
+   or `adb install -r app/build/outputs/apk/debug/app-debug.apk`.
+
+### 2. Release APK (R8-minified, resource-shrunk, for store/private distribution)
+
+1. **Build the release APK**:
+   ```bash
+   ./gradlew assembleRelease       # macOS / Linux
+   .\gradlew.bat assembleRelease   # Windows
+   ```
+2. **Output**: `app/build/outputs/apk/release/app-release.apk` (~4 MB — R8 minify + resource shrink enabled).
+3. **Important — signing**: the project currently signs the release build with the **debug keystore** (see `app/build.gradle.kts`) so you can test a fully-optimized build immediately. **Do not upload a debug-signed APK to Google Play.** For distribution, configure a real keystore (next section).
+
+> For the **Google Play** format, build an App Bundle instead: `./gradlew bundleRelease` → `app/build/outputs/bundle/release/app-release.aab`.
+
+### 3. Configure a Production Signing Keystore
+
+```bash
+# 1. Generate a keystore (fill in the prompts)
+keytool -genkey -v -keystore release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias imagetopdf
+```
+
+```properties
+# 2. Create keystore.properties in the project root (gitignored — never commit it)
+storeFile=release.jks
+storePassword=CHANGE_ME
+keyAlias=imagetopdf
+keyPassword=CHANGE_ME
+```
+
+```kotlin
+// 3. Add to app/build.gradle.kts (after the existing signingConfigs debug block)
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+
+android {
+    signingConfigs {
+        create("release") {
+            if (keystoreProps.isNotEmpty()) {
+                storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName(
+                if (keystoreProps.isNotEmpty()) "release" else "debug"
+            )
+        }
+    }
+}
+```
+
+Then re-run `./gradlew assembleRelease` — the APK is now signed with your production key.
+
+### 4. Tests & Verification
+
+| Command | What it does |
+|---|---|
+| `./gradlew testDebugUnitTest` | Runs all unit tests (currently **28** — model, logic & PDF-math regression suites) |
+| `./gradlew lintDebug` | Android Lint static analysis (report: `app/build/reports/lint-results-debug.html`) |
+| `./gradlew clean assembleDebug assembleRelease testDebugUnitTest lintDebug` | One-shot full verification |
+
+### 5. Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| `JAVA_HOME is not set` / "Unable to locate a Java Runtime" | Install JDK 17 and set `JAVA_HOME`; ensure `java -version` reports 17 |
+| "Failed to find target with hash string 'android-36'" | Open SDK Manager in Android Studio, install API 36 platform + Build Tools |
+| "SDK location not found" | Create `local.properties` with `sdk.dir=C\:\\Users\\<you>\\AppData\\Local\\Android\\Sdk` |
+| `OutOfMemoryError` during Gradle build | Add `org.gradle.jvmargs=-Xmx2048m` to `gradle.properties` (already tuned for this project) |
+| Release APK marked "debug-signed" | You ran `assembleRelease` with the default debug signing — follow §3 to configure your keystore |
+| Huge debug APK size | Expected — debug builds skip R8/shrinking; use the release APK for distribution |
 
 ---
 

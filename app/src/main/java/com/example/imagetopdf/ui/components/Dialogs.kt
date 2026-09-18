@@ -138,6 +138,7 @@ fun PdfSuccessDialog(
     onSharePdf: (PdfRecord) -> Unit,
     onSaveToDownloads: (PdfRecord) -> Unit,
     onPrintPdf: (PdfRecord) -> Unit,
+    onDone: () -> Unit,
     onDismiss: () -> Unit
 ) {
     BasicAlertDialog(onDismissRequest = onDismiss) {
@@ -177,12 +178,6 @@ fun PdfSuccessDialog(
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = "Compiled in pristine quality and ready to share or print.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
 
                 Spacer(modifier = Modifier.height(18.dp))
 
@@ -295,12 +290,14 @@ fun PdfSuccessDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                OutlinedButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.fillMaxWidth(),
+                Button(
+                    onClick = onDone,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Done")
+                    Text("Done", fontWeight = FontWeight.Bold)
                 }
             }
         }

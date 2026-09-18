@@ -6,8 +6,11 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.imagetopdf.data.DocumentHistoryRepository
+import com.example.imagetopdf.data.DraftRepository
 import com.example.imagetopdf.data.ThemePreferences
 import com.example.imagetopdf.engine.PdfGeneratorEngine
+import com.example.imagetopdf.engine.PdfMath
+import com.example.imagetopdf.model.DraftRecord
 import com.example.imagetopdf.model.FilterType
 import com.example.imagetopdf.model.PageItem
 import com.example.imagetopdf.model.PageOrientation
@@ -36,13 +39,20 @@ data class UiState(
     val generationProgress: Pair<Int, Int> = Pair(0, 0),
     val lastGeneratedRecord: PdfRecord? = null,
     val pdfConfig: PdfConfig = PdfConfig(),
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    /** True when user presses back on HOME with images loaded — prompts Discard/Draft */
+    val showDiscardDialog: Boolean = false,
+    /** True when user double-taps back on empty HOME — prompts Exit confirmation */
+    val showExitConfirmDialog: Boolean = false
 )
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = DocumentHistoryRepository(application)
     val historyRecords: StateFlow<List<PdfRecord>> = repository.historyFlow
+
+    private val draftRepository = DraftRepository(application)
+    val drafts: StateFlow<List<DraftRecord>> = draftRepository.draftsFlow
 
     private val themePreferences = ThemePreferences(application)
     val themeMode: StateFlow<ThemeMode> = themePreferences.themeMode
@@ -123,9 +133,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val updated = current.pages.map { page ->
                 if (page.id == pageId) {
                     page.copy(
-                        scale = scale.coerceIn(0.5f, 5.0f),
-                        panOffsetX = panX.coerceIn(-1.5f, 1.5f),
-                        panOffsetY = panY.coerceIn(-1.5f, 1.5f),
+                        scale = scale.coerceIn(PdfMath.SCALE_MIN, PdfMath.SCALE_MAX),
+                        panOffsetX = panX.coerceIn(PdfMath.PAN_MIN, PdfMath.PAN_MAX),
+                        panOffsetY = panY.coerceIn(PdfMath.PAN_MIN, PdfMath.PAN_MAX),
                         fillPage = fillPage
                     )
                 } else page
@@ -189,7 +199,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun openConfigDialog() {
-        if (_uiState.value.pages.isEmpty()) return
+        val state = _uiState.value
+        if (state.pages.isEmpty()) return
+        if (state.isGeneratingPdf) return
         _uiState.update { it.copy(isConfigDialogVisible = true) }
     }
 
@@ -206,10 +218,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun generatePdf(context: Context) {
-        val pages = _uiState.value.pages
-        if (pages.isEmpty()) return
+        val state = _uiState.value
+        if (state.pages.isEmpty()) return
+        if (state.isGeneratingPdf) return
 
-        val config = _uiState.value.pdfConfig
+        val pages = state.pages
+        val config = state.pdfConfig
         _uiState.update {
             it.copy(
                 isConfigDialogVisible = false,
@@ -359,4 +373,63 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
     }
+
+    // ── Back-press guard: Discard / Draft ─────────────────────────────────────────
+    fun showDiscardDialog() = _uiState.update { it.copy(showDiscardDialog = true) }
+    fun dismissDiscardDialog() = _uiState.update { it.copy(showDiscardDialog = false) }
+    /** Discard all current pages and return to empty home */
+    fun discardAllPages() = _uiState.update { it.copy(pages = emptyList(), selectedPageIds = emptySet(), showDiscardDialog = false) }
+
+    /**
+     * Save the current pages as a named draft, then clear them.
+     * Also takes persistable URI permission for each gallery URI so they survive process death.
+     */
+    fun saveDraft() {
+        val currentPages = _uiState.value.pages
+        if (currentPages.isEmpty()) return
+        val draftName = "Draft_" + SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(Date())
+        val draft = DraftRecord(
+            name = draftName,
+            pageUris = currentPages.map { it.originalUri?.toString() ?: "" },
+            pageRotations = currentPages.map { it.rotation },
+            pageFilters = currentPages.map { it.filterType.name }
+        )
+        // Try to take persistable URI permission so gallery URIs survive app restart
+        val cr = getApplication<Application>().contentResolver
+        currentPages.forEach { page ->
+            try {
+                page.originalUri?.let { uri ->
+                    cr.takePersistableUriPermission(
+                        uri,
+                        android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                }
+            } catch (_: Exception) { /* camera/FileProvider URIs don't need this */ }
+        }
+        viewModelScope.launch {
+            draftRepository.saveDraft(draft)
+        }
+        // Clear pages after saving
+        _uiState.update { it.copy(pages = emptyList(), selectedPageIds = emptySet(), showDiscardDialog = false) }
+    }
+
+    /** Load a draft back as the current session pages */
+    fun loadDraft(draft: DraftRecord) {
+        val pages = draft.pageUris.mapIndexedNotNull { index, uriStr ->
+            val uri = try { Uri.parse(uriStr) } catch (_: Exception) { null } ?: return@mapIndexedNotNull null
+            val rotation = draft.pageRotations.getOrElse(index) { 0 }
+            val filterName = draft.pageFilters.getOrElse(index) { FilterType.ORIGINAL.name }
+            val filter = try { FilterType.valueOf(filterName) } catch (_: Exception) { FilterType.ORIGINAL }
+            PageItem(originalUri = uri, rotation = rotation, filterType = filter)
+        }
+        _uiState.update { it.copy(pages = pages, selectedPageIds = emptySet()) }
+    }
+
+    fun deleteDraft(draft: DraftRecord) {
+        viewModelScope.launch { draftRepository.deleteDraft(draft.id) }
+    }
+
+    // ── Back-press guard: Exit confirmation ───────────────────────────────────
+    fun showExitConfirmDialog() = _uiState.update { it.copy(showExitConfirmDialog = true) }
+    fun dismissExitConfirmDialog() = _uiState.update { it.copy(showExitConfirmDialog = false) }
 }

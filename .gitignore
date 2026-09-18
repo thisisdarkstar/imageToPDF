@@ -56,3 +56,5 @@ screen_*.png
 # OS-specific
 .DS_Store
 Thumbs.db
+
+implementation_plan.md

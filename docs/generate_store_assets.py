@@ -177,7 +177,7 @@ def create_feature_graphic(icon_path, output_path):
 
     draw.text((364, 220), "High-fidelity on-device document scanner & converter.\nCrisp B&W enhancement, watermarking, and reordering.", fill=(203, 213, 225, 255), font=desc_font)
 
-    # Feature Badges (Grid 2x2 or compact row)
+    # Feature Badges — centered 2x2 grid so the row never overflows the canvas
     pills = [
         ("100% OFFLINE", (16, 185, 129)),
         ("LOSSLESS CLARITY", (6, 182, 212)),
@@ -185,13 +185,15 @@ def create_feature_graphic(icon_path, output_path):
         ("B&W CLEAN SCAN", (245, 158, 11))
     ]
 
-    px = 364
-    py = 310
-    for label, color in pills:
-        pill_w = len(label) * 9 + 28
-        draw.rounded_rectangle([px, py, px + pill_w, py + 32], radius=8, fill=(color[0], color[1], color[2], 35), outline=color, width=1)
-        draw.text((px + 14, py + 7), label, fill=color, font=pill_font)
-        px += pill_w + 12
+    for row in range(2):
+        px = 364
+        py = 302 + row * 44
+        for label, color in pills[row * 2:row * 2 + 2]:
+            text_w = draw.textlength(label, font=pill_font) if pill_font else len(label) * 9
+            pill_w = int(text_w) + 60
+            draw.rounded_rectangle([px, py, px + pill_w, py + 32], radius=8, fill=(color[0], color[1], color[2], 35), outline=color, width=1)
+            draw.text((px + 30, py + 7), label, fill=color, font=pill_font)
+            px += pill_w + 12
 
     img.save(output_path, "PNG")
     print(f"Generated 1024x500 Feature Graphic at: {output_path}")
