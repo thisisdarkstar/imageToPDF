@@ -172,7 +172,7 @@ def create_feature_graphic(icon_path, output_path):
         title_font = subtitle_font = pill_font = desc_font = None
 
     # Title
-    draw.text((360, 115), "Image to PDF", fill=(255, 255, 255, 255), font=title_font)
+    draw.text((360, 115), "ImageToPdf Free", fill=(255, 255, 255, 255), font=title_font)
     draw.text((364, 178), "Studio Quality  •  Private by Design", fill=(6, 182, 212, 255), font=subtitle_font)
 
     draw.text((364, 220), "High-fidelity on-device document scanner & converter.\nCrisp B&W enhancement, watermarking, and reordering.", fill=(203, 213, 225, 255), font=desc_font)
