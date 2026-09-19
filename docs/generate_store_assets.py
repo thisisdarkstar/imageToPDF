@@ -131,75 +131,25 @@ def create_store_icon(output_path):
     print(f"Generated 512x512 Store Icon at: {output_path}")
 
 def create_feature_graphic(icon_path, output_path):
-    w, h = 1024, 500
-    img = Image.new("RGBA", (w, h), (0, 0, 0, 255))
-    draw = ImageDraw.Draw(img)
+    from generate_feature_graphic import generate_feature_graphic
+    generate_feature_graphic(output_path)
 
-    # Elegant Studio Dark gradient background
-    for x in range(w):
-        t = x / w
-        r = int(15 + t * (30 - 15))
-        g = int(23 + t * (27 - 23))
-        b = int(42 + t * (75 - 42))
-        draw.line([(x, 0), (x, h)], fill=(r, g, b, 255))
-
-    # Glow accents (Cyan & Indigo radial blobs)
-    glow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    glow_draw = ImageDraw.Draw(glow)
-    glow_draw.ellipse([w - 450, -50, w + 150, 450], fill=(79, 70, 229, 45))
-    glow_draw.ellipse([w - 300, 100, w + 100, 500], fill=(6, 182, 212, 35))
-    glow = glow.filter(ImageFilter.GaussianBlur(60))
-    img = Image.alpha_composite(img, glow)
-    draw = ImageDraw.Draw(img)
-
-    # Left Column: App Icon
-    if os.path.exists(icon_path):
-        icon = Image.open(icon_path).resize((240, 240), Image.Resampling.LANCZOS)
-        # Drop shadow for icon
-        icon_shadow = Image.new("RGBA", (240, 240), (0, 0, 0, 0))
-        icon_shadow.paste((0, 0, 0, 140), mask=icon.split()[3])
-        icon_shadow = icon_shadow.filter(ImageFilter.GaussianBlur(24))
-        img.paste(icon_shadow, (84, 138), icon_shadow)
-        img.paste(icon, (80, 130), icon)
-
-    # Center/Right Column: Typography and Badges
-    try:
-        title_font = ImageFont.truetype("arialbd.ttf", 50)
-        subtitle_font = ImageFont.truetype("arialbd.ttf", 21)
-        pill_font = ImageFont.truetype("arialbd.ttf", 15)
-        desc_font = ImageFont.truetype("arial.ttf", 17)
-    except:
-        title_font = subtitle_font = pill_font = desc_font = None
-
-    # Title
-    draw.text((360, 115), "ImageToPdf Free", fill=(255, 255, 255, 255), font=title_font)
-    draw.text((364, 178), "Studio Quality  •  Private by Design", fill=(6, 182, 212, 255), font=subtitle_font)
-
-    draw.text((364, 220), "High-fidelity on-device document scanner & converter.\nCrisp B&W enhancement, watermarking, and reordering.", fill=(203, 213, 225, 255), font=desc_font)
-
-    # Feature Badges — centered 2x2 grid so the row never overflows the canvas
-    pills = [
-        ("100% OFFLINE", (16, 185, 129)),
-        ("LOSSLESS CLARITY", (6, 182, 212)),
-        ("ZERO TRACKING", (129, 140, 248)),
-        ("B&W CLEAN SCAN", (245, 158, 11))
-    ]
-
-    for row in range(2):
-        px = 364
-        py = 302 + row * 44
-        for label, color in pills[row * 2:row * 2 + 2]:
-            text_w = draw.textlength(label, font=pill_font) if pill_font else len(label) * 9
-            pill_w = int(text_w) + 60
-            draw.rounded_rectangle([px, py, px + pill_w, py + 32], radius=8, fill=(color[0], color[1], color[2], 35), outline=color, width=1)
-            draw.text((px + 30, py + 7), label, fill=color, font=pill_font)
-            px += pill_w + 12
-
-    img.save(output_path, "PNG")
-    print(f"Generated 1024x500 Feature Graphic at: {output_path}")
+def create_favicons(icon_path, assets_dir, docs_dir):
+    if not os.path.exists(icon_path):
+        return
+    icon = Image.open(icon_path).convert("RGBA")
+    icon.save(os.path.join(assets_dir, "favicon.ico"), format="ICO", sizes=[(16, 16), (32, 32), (48, 48), (64, 64)])
+    icon.save(os.path.join(docs_dir, "favicon.ico"), format="ICO", sizes=[(16, 16), (32, 32), (48, 48), (64, 64)])
+    icon.resize((32, 32), Image.Resampling.LANCZOS).save(os.path.join(assets_dir, "favicon-32x32.png"))
+    icon.resize((16, 16), Image.Resampling.LANCZOS).save(os.path.join(assets_dir, "favicon-16x16.png"))
+    icon.resize((180, 180), Image.Resampling.LANCZOS).save(os.path.join(assets_dir, "apple-touch-icon.png"))
+    print("Generated favicons (16x16, 32x32, 180x180, ICO)")
 
 if __name__ == "__main__":
-    icon_out = r"f:\Projects\android projects\imagetopdf\docs\assets\icon_512.png"
-    banner_out = r"f:\Projects\android projects\imagetopdf\docs\assets\feature_graphic_1024x500.png"
+    docs_dir = r"f:\Projects\android projects\imagetopdf\docs"
+    assets_dir = os.path.join(docs_dir, "assets")
+    icon_out = os.path.join(assets_dir, "icon_512.png")
+    banner_out = os.path.join(assets_dir, "feature_graphic_1024x500.png")
     create_store_icon(icon_out)
+    create_favicons(icon_out, assets_dir, docs_dir)
     create_feature_graphic(icon_out, banner_out)
