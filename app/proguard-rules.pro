@@ -67,12 +67,12 @@
 # Application Data Models & Engine
 # Keep data classes, enums, and properties to guarantee safe serialization & state
 # -----------------------------------------------------------------------
--keep class com.example.imagetopdf.model.** { *; }
--keepclassmembers enum com.example.imagetopdf.model.** { *; }
+-keep class io.github.thisisdarkstar.imagetopdf.model.** { *; }
+-keepclassmembers enum io.github.thisisdarkstar.imagetopdf.model.** { *; }
 
--keep class com.example.imagetopdf.engine.** { *; }
--keep class com.example.imagetopdf.data.** { *; }
--keep class com.example.imagetopdf.theme.ThemeMode { *; }
+-keep class io.github.thisisdarkstar.imagetopdf.engine.** { *; }
+-keep class io.github.thisisdarkstar.imagetopdf.data.** { *; }
+-keep class io.github.thisisdarkstar.imagetopdf.theme.ThemeMode { *; }
 
 # -----------------------------------------------------------------------
 # Android Core & FileProvider

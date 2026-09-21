@@ -43,9 +43,10 @@ captures/
 # Kotlin compiler caches
 .kotlin/
 
-# Keystore files
+# Keystore files & signing credentials
 *.jks
 *.keystore
+keystore.properties
 
 # Temporary and diagnostic files
 *.hprof

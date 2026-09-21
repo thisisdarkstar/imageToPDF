@@ -1,18 +1,39 @@
+import java.util.Properties
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlin.serialization)
 }
 
+// Load release signing config from keystore.properties (kept out of git).
+// Falls back to debug signing if the file is absent — keeps CI/dev builds working.
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+val hasReleaseSigning = keystoreProps.getProperty("storeFile")?.isNotBlank() == true
+
 android {
-    namespace = "com.example.imagetopdf"
+    namespace = "io.github.thisisdarkstar.imagetopdf"
     compileSdk = 36
     defaultConfig {
-        applicationId = "com.example.imagetopdf"
+        applicationId = "io.github.thisisdarkstar.imagetopdf"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
+    }
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
@@ -23,7 +44,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(
+                if (hasReleaseSigning) "release" else "debug"
+            )
         }
     }
 

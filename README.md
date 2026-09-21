@@ -85,7 +85,7 @@ This application is engineered with an uncompromising privacy architecture:
 ## 🛠️ Architecture & Tech Stack
 
 ```
-com.example.imagetopdf
+io.github.thisisdarkstar.imagetopdf
 ├── data/
 │   ├── HistoryPreferences.kt      # SharedPreferences persistence for PDF history records
 │   └── ThemePreferences.kt        # Local storage for ThemeMode (Light, Dark, System)
