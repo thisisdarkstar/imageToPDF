@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy - Image to PDF</title>
+    <title>Privacy Policy — Image to PDF</title>
+    <meta name="description" content="Privacy Policy for Image to PDF — a 100% offline, privacy-first Android app. Zero data collection, no internet permission, no analytics.">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+    <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,53 +21,134 @@
             --primary-dark: #3730A3;
             --accent: #06B6D4;
             --success: #10B981;
+            --danger: #DC2626;
             --bg: #F8FAFC;
+            --bg-elev: #FFFFFF;
             --card-bg: #FFFFFF;
             --text-main: #0F172A;
             --text-muted: #64748B;
             --border: #E2E8F0;
-            --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+            --border-soft: #EEF2F6;
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.04);
+            --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+            --shadow-lg: 0 24px 48px -12px rgba(15, 23, 42, 0.14), 0 12px 24px -8px rgba(15, 23, 42, 0.06);
+            --shadow-glow: 0 20px 40px -12px rgba(79, 70, 229, 0.35);
             --radius: 16px;
+            --radius-sm: 10px;
+            --radius-lg: 24px;
+            --nav-h: 62px;
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --primary: #6366F1;
+                --primary: #818CF8;
                 --primary-light: #1E1B4B;
                 --primary-dark: #4338CA;
                 --accent: #22D3EE;
+                --danger: #F87171;
                 --bg: #0B0F19;
+                --bg-elev: #101627;
                 --card-bg: #131B2E;
                 --text-main: #F1F5F9;
                 --text-muted: #94A3B8;
-                --border: #1E293B;
-                --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+                --border: #1F2A44;
+                --border-soft: #182036;
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+                --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+                --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+                --shadow-glow: 0 20px 40px -12px rgba(129, 140, 248, 0.3);
             }
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 16px); }
 
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
+            background: var(--bg);
+            background-image:
+                radial-gradient(1200px 600px at 10% -10%, rgba(79, 70, 229, 0.12), transparent 60%),
+                radial-gradient(900px 500px at 100% 0%, rgba(6, 182, 212, 0.10), transparent 60%);
+            background-attachment: fixed;
             color: var(--text-main);
             line-height: 1.7;
-            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
-        .container {
-            max-width: 840px;
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-image:
+                    radial-gradient(1200px 600px at 10% -10%, rgba(129, 140, 248, 0.18), transparent 60%),
+                    radial-gradient(900px 500px at 100% 0%, rgba(34, 211, 238, 0.10), transparent 60%);
+            }
+        }
+
+        /* ---------- Nav ---------- */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            height: var(--nav-h);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            background: color-mix(in oklab, var(--bg-elev) 78%, transparent);
+            backdrop-filter: saturate(160%) blur(14px);
+            -webkit-backdrop-filter: saturate(160%) blur(14px);
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .nav-inner {
+            max-width: 900px;
+            width: 100%;
             margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 40px;
+        .nav-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            color: var(--text-main);
+            text-decoration: none;
+            letter-spacing: -0.2px;
         }
+
+        .nav-brand img {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 13px;
+            text-decoration: none;
+            transition: transform .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease);
+        }
+        .nav-back:hover { transform: translateX(-2px); box-shadow: var(--shadow-sm); }
+        .nav-back svg { width: 14px; height: 14px; }
+
+        /* ---------- Layout ---------- */
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px 60px; }
+
+        /* ---------- Header ---------- */
+        header { text-align: center; margin-bottom: 40px; }
 
         .app-badge {
             display: inline-flex;
@@ -70,26 +158,36 @@
             color: var(--primary);
             padding: 6px 14px;
             border-radius: 9999px;
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 12px;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 16px;
+            letter-spacing: 0.8px;
+            margin-bottom: 18px;
+        }
+        .app-badge .dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15); animation: pulse 2.4s var(--ease) infinite; }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.35); }
+            50%      { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.08); }
         }
 
         h1 {
-            font-size: 36px;
+            font-size: clamp(30px, 4.6vw, 44px);
             font-weight: 800;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.6px;
+            line-height: 1.1;
             color: var(--text-main);
             margin-bottom: 10px;
         }
-
-        .effective-date {
-            color: var(--text-muted);
-            font-size: 14px;
+        h1 .grad {
+            background: linear-gradient(120deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
+        .effective-date { color: var(--text-muted); font-size: 14px; }
+
+        /* ---------- Cards ---------- */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -97,142 +195,250 @@
             padding: 32px;
             margin-bottom: 24px;
             box-shadow: var(--shadow);
+            transition: transform .3s var(--ease), box-shadow .3s var(--ease);
         }
+        .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
 
         .summary-box {
-            background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%);
-            border: 1px solid rgba(79, 70, 229, 0.2);
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.10) 0%, rgba(6, 182, 212, 0.10) 100%);
+            border: 1px solid rgba(79, 70, 229, 0.22);
             border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 30px;
+            padding: 26px;
+            margin-bottom: 28px;
+        }
+        @media (prefers-color-scheme: dark) {
+            .summary-box { border-color: rgba(129, 140, 248, 0.28); }
         }
 
-        .summary-box h2 {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 12px;
+        .section-title {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            margin-bottom: 18px;
+            color: var(--text-main);
+        }
+        .section-title .kicker {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 18px;
+        }
+        .section-title .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
         }
 
-        .summary-list {
-            list-style: none;
-        }
-
+        .summary-list { list-style: none; }
         .summary-list li {
             position: relative;
-            padding-left: 28px;
-            margin-bottom: 10px;
+            padding-left: 30px;
+            margin-bottom: 12px;
             font-size: 15px;
             font-weight: 500;
         }
-
         .summary-list li::before {
-            content: "✓";
+            content: "";
             position: absolute;
             left: 0;
-            color: var(--success);
-            font-weight: bold;
+            top: 6px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.15);
+        }
+        .summary-list li::after {
+            content: "";
+            position: absolute;
+            left: 5px;
+            top: 10px;
+            width: 8px;
+            height: 5px;
+            border-left: 2px solid var(--success);
+            border-bottom: 2px solid var(--success);
+            transform: rotate(-45deg);
         }
 
         h2 {
             font-size: 22px;
-            font-weight: 700;
+            font-weight: 800;
             margin-top: 8px;
             margin-bottom: 16px;
             color: var(--text-main);
+            letter-spacing: -0.3px;
+        }
+        h3 { font-size: 17px; font-weight: 700; margin: 18px 0 8px; color: var(--text-main); }
+
+        p { margin-bottom: 14px; color: var(--text-main); font-size: 15px; }
+        p:last-child { margin-bottom: 0; }
+
+        ul { padding-left: 20px; margin-bottom: 8px; }
+        li { margin-bottom: 8px; font-size: 15px; }
+        li::marker { color: var(--primary); }
+
+        code {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.88em;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         }
 
-        h3 {
-            font-size: 17px;
-            font-weight: 600;
-            margin: 18px 0 8px 0;
-            color: var(--text-main);
-        }
-
-        p {
-            margin-bottom: 14px;
-            color: var(--text-main);
-            font-size: 15px;
-        }
-
-        ul {
-            padding-left: 20px;
-            margin-bottom: 16px;
-        }
-
-        li {
-            margin-bottom: 8px;
-            font-size: 15px;
-        }
-
+        /* ---------- Permission table ---------- */
         .permission-table {
             width: 100%;
-            border-collapse: collapse;
-            margin: 16px 0 20px 0;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 16px 0 20px;
             font-size: 14px;
-        }
-
-        .permission-table th, .permission-table td {
             border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .permission-table th, .permission-table td {
+            border-bottom: 1px solid var(--border-soft);
             padding: 12px 16px;
             text-align: left;
+            vertical-align: top;
         }
-
+        .permission-table tr:last-child th, .permission-table tr:last-child td { border-bottom: 0; }
         .permission-table th {
-            background-color: var(--primary-light);
+            background: var(--primary-light);
             color: var(--primary);
-            font-weight: 700;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 12px;
         }
+        .permission-table tbody tr:nth-child(odd) td { background: color-mix(in oklab, var(--bg-elev) 92%, var(--primary-light)); }
+        .permission-table td strong { color: var(--text-main); }
 
         .pill {
             display: inline-block;
             background: rgba(16, 185, 129, 0.12);
             color: var(--success);
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-weight: 700;
             font-size: 12px;
+            letter-spacing: 0.3px;
         }
+        .pill.deny { color: var(--danger); background: color-mix(in oklab, var(--danger) 18%, transparent); }
 
+        /* ---------- Contact ---------- */
+        .contact-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+        .contact-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: transform .2s var(--ease), border-color .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease);
+        }
+        .contact-chip:hover { transform: translateY(-1px); border-color: var(--primary); background: var(--primary-light); box-shadow: var(--shadow-sm); }
+        .contact-chip svg { width: 16px; height: 16px; color: var(--primary); }
+
+        /* ---------- Footer ---------- */
         footer {
             text-align: center;
-            margin-top: 48px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
+            margin-top: 56px;
+            padding: 28px 20px;
+            border-top: 1px solid var(--border-soft);
             color: var(--text-muted);
             font-size: 13px;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* ---------- Reveal ---------- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity .7s var(--ease), transform .7s var(--ease);
+            will-change: transform, opacity;
+        }
+        .reveal.in { opacity: 1; transform: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+            .reveal { opacity: 1; transform: none; }
+        }
+
+        @media (max-width: 560px) {
+            .nav { padding: 0 14px; }
+            .container { padding: 24px 16px 40px; }
+            .card { padding: 22px; }
+            .permission-table th, .permission-table td { padding: 10px 12px; }
         }
     </style>
 </head>
 <body>
+    <nav class="nav" aria-label="Primary">
+        <div class="nav-inner">
+            <a class="nav-brand" href="index.html" aria-label="Image to PDF — home">
+                <img src="assets/icon_512.png" alt="" aria-hidden="true">
+                <span>Image&nbsp;to&nbsp;PDF</span>
+            </a>
+            <a class="nav-back" href="index.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                Back to home
+            </a>
+        </div>
+    </nav>
+
     <div class="container">
-        <header>
-            <div class="app-badge">Privacy First • 100% On-Device</div>
-            <h1>Privacy Policy</h1>
-            <p class="effective-date">Application: <strong>Image to PDF</strong> | Last Updated: September 18, 2026</p>
+        <header class="reveal">
+            <div class="app-badge"><span class="dot" aria-hidden="true"></span> Privacy First · 100% On-Device</div>
+            <h1>Privacy <span class="grad">Policy</span></h1>
+            <p class="effective-date">Application: <strong>Image to PDF</strong> · Last Updated: September 18, 2026</p>
         </header>
 
-        <div class="summary-box">
-            <h2>🛡️ Summary of Our Privacy Philosophy</h2>
+        <div class="summary-box reveal">
+            <div class="section-title" style="margin-bottom:12px;">
+                <span class="kicker" aria-hidden="true">🛡️</span> Summary of our privacy philosophy
+            </div>
             <ul class="summary-list">
                 <li><strong>Zero Data Collection:</strong> We do not collect, harvest, store, or transmit your photos, documents, or personal data.</li>
-                <li><strong>No Internet Permission:</strong> The app does not declare or request internet access (<code style="background:rgba(0,0,0,0.06);padding:2px 4px;border-radius:4px;">android.permission.INTERNET</code>). It is physically impossible for the app to send data to any remote server.</li>
+                <li><strong>No Internet Permission:</strong> The app does not declare or request internet access (<code>android.permission.INTERNET</code>). It is physically impossible for the app to send data to any remote server.</li>
                 <li><strong>100% Offline Processing:</strong> All image enhancements, binarization, reordering, and PDF rendering happen locally in device memory.</li>
-                <li><strong>Zero Analytics & Third-Party Trackers:</strong> No advertising SDKs, tracking pixels, or diagnostic beacons are present.</li>
+                <li><strong>Zero Analytics &amp; Third-Party Trackers:</strong> No advertising SDKs, tracking pixels, or diagnostic beacons are present.</li>
             </ul>
         </div>
 
-        <div class="card">
-            <h2>1. Information We Collect</h2>
+        <div class="card reveal">
+            <div class="section-title">
+                <span class="num" aria-hidden="true">1</span> Information we collect
+            </div>
             <p><strong>None.</strong> <em>Image to PDF</em> is built strictly under the principle of Zero Knowledge and Privacy by Design. We do not require account creation, registration, email signups, or personal identity information of any kind.</p>
             <p>Your documents, images, filenames, metadata, and generated PDFs remain exclusively on your device and are never monitored or analyzed.</p>
         </div>
 
-        <div class="card">
-            <h2>2. Device Permissions Used</h2>
+        <div class="card reveal">
+            <div class="section-title">
+                <span class="num" aria-hidden="true">2</span> Device permissions used
+            </div>
             <p>To provide core document scanning functionality, <em>Image to PDF</em> requests the minimum necessary permissions in compliance with Google Play's Principle of Least Privilege:</p>
 
             <table class="permission-table">
@@ -251,40 +457,48 @@
                     </tr>
                     <tr>
                         <td><strong>Storage Access</strong></td>
-                        <td><span class="pill">Scoped / PhotoPicker</span></td>
-                        <td>The app uses the standard Android System PhotoPicker to select images without requiring broad storage permissions. Generated PDFs are kept in your private app space or exported directly to the public <code style="background:rgba(0,0,0,0.06);padding:2px 4px;border-radius:4px;">Downloads/ImageToPDF/</code> directory via Android MediaStore.</td>
+                        <td><span class="pill">Scoped · PhotoPicker</span></td>
+                        <td>The app uses the standard Android System PhotoPicker to select images without requiring broad storage permissions. Generated PDFs are kept in your private app space or exported directly to the public <code>Downloads/ImageToPDF/</code> directory via Android MediaStore.</td>
                     </tr>
                     <tr>
                         <td><strong>android.permission.INTERNET</strong></td>
-                        <td><span class="pill" style="color:#DC2626;background:rgba(220,38,38,0.12)">NOT REQUESTED</span></td>
+                        <td><span class="pill deny">Not Requested</span></td>
                         <td>The app operates completely offline with zero network connectivity.</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="card">
-            <h2>3. Google Play Data Safety Declaration</h2>
+        <div class="card reveal">
+            <div class="section-title">
+                <span class="num" aria-hidden="true">3</span> Google Play Data Safety declaration
+            </div>
             <p>In adherence to Google Play Console Data Safety requirements:</p>
             <ul>
-                <li><strong>Data collected:</strong> "No" (The application does not collect user data).</li>
-                <li><strong>Data shared:</strong> "No" (The application does not share user data with any third party).</li>
+                <li><strong>Data collected:</strong> "No" — the application does not collect user data.</li>
+                <li><strong>Data shared:</strong> "No" — the application does not share user data with any third party.</li>
                 <li><strong>Security practices:</strong> All data stays within Android's sandboxed local application storage.</li>
             </ul>
         </div>
 
-        <div class="card">
-            <h2>4. Third-Party Libraries & Services</h2>
+        <div class="card reveal">
+            <div class="section-title">
+                <span class="num" aria-hidden="true">4</span> Third-party libraries &amp; services
+            </div>
             <p>The application only utilizes official Google Jetpack AndroidX components and Coil for local memory bitmap decoding. No third-party ad networks, social logins, or behavioral analytics frameworks are integrated into this software.</p>
         </div>
 
-        <div class="card">
-            <h2>5. Children's Privacy (COPPA & Families Policy)</h2>
+        <div class="card reveal">
+            <div class="section-title">
+                <span class="num" aria-hidden="true">5</span> Children's privacy (COPPA &amp; Families Policy)
+            </div>
             <p>Because our application collects zero personal information from any user, it complies with the Children's Online Privacy Protection Act (COPPA) and Google Play Families policy. It is safe for all age demographics.</p>
         </div>
 
-        <div class="card">
-            <h2>6. Data Retention and Deletion</h2>
+        <div class="card reveal">
+            <div class="section-title">
+                <span class="num" aria-hidden="true">6</span> Data retention and deletion
+            </div>
             <p>Since your documents and history exist solely on your physical device, you retain 100% control over them at all times:</p>
             <ul>
                 <li>You can delete individual PDF records from the in-app History screen with a single tap.</li>
@@ -292,16 +506,45 @@
             </ul>
         </div>
 
-        <div class="card">
-            <h2>7. Contact Information</h2>
-            <p>If you have any questions, inquiries, or feedback regarding this Privacy Policy, please feel free to reach out:</p>
-            <p><strong>Developer Support:</strong> support@imagetopdf.app</p>
-            <p><strong>Website / Repository:</strong> https://github.com/example/imagetopdf</p>
+        <div class="card reveal">
+            <div class="section-title">
+                <span class="num" aria-hidden="true">7</span> Contact &amp; support
+            </div>
+            <p>If you have any questions, inquiries, or feedback regarding this Privacy Policy, please reach out via the project's public channels:</p>
+            <div class="contact-links">
+                <a class="contact-chip" href="https://github.com/thisisdarkstar/imageToPDF" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18c-4.51 2-5-2-7-2"/><path d="M15 22v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 19 5.77 5.07 5.07 0 0 0 18.91 2S17.73 1.65 15 3.48a13.38 13.38 0 0 0-7 0C5.27 1.65 4.09 2 4.09 2A5.07 5.07 0 0 0 4 5.77a5.44 5.44 0 0 0-1.5 3.75c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 8 19.13V22"/></svg>
+                    GitHub repository
+                </a>
+                <a class="contact-chip" href="https://github.com/thisisdarkstar/imageToPDF/issues" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                    Report an issue
+                </a>
+            </div>
         </div>
 
         <footer>
-            <p>© 2026 Image to PDF. All rights reserved. • Studio Quality • Private by Design</p>
+            <p>© 2026 Image to PDF · <a href="index.html">Home</a> · Studio Quality · Private by Design</p>
         </footer>
     </div>
+
+    <script>
+        (function () {
+            var mq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+            if (!('IntersectionObserver' in window) || (mq && mq.matches)) {
+                document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+                return;
+            }
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('in');
+                        io.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+            document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+        })();
+    </script>
 </body>
 </html>

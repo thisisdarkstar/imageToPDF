@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image to PDF — Convert Photos to PDF on Android</title>
     <meta name="description" content="Image to PDF — a 100% offline, privacy-first Android app that converts photos and scans into crisp PDF documents. No ads, no tracking, no internet access.">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="color-scheme" content="light dark">
+    <meta property="og:title" content="Image to PDF — Convert Photos to PDF on Android">
+    <meta property="og:description" content="A 100% offline, privacy-first Android app that converts photos and scans into crisp PDF documents.">
+    <meta property="og:image" content="./feature_graphic_1024x500.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
@@ -19,69 +26,200 @@
             --primary-dark: #3730A3;
             --accent: #06B6D4;
             --success: #10B981;
+            --warning: #F59E0B;
             --bg: #F8FAFC;
+            --bg-elev: #FFFFFF;
             --card-bg: #FFFFFF;
             --text-main: #0F172A;
             --text-muted: #64748B;
             --border: #E2E8F0;
-            --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+            --border-soft: #EEF2F6;
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.04);
+            --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+            --shadow-lg: 0 24px 48px -12px rgba(15, 23, 42, 0.14), 0 12px 24px -8px rgba(15, 23, 42, 0.06);
+            --shadow-glow: 0 20px 40px -12px rgba(79, 70, 229, 0.35);
             --radius: 16px;
+            --radius-sm: 10px;
+            --radius-lg: 24px;
+            --nav-h: 62px;
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --primary: #6366F1;
+                --primary: #818CF8;
                 --primary-light: #1E1B4B;
                 --primary-dark: #4338CA;
                 --accent: #22D3EE;
                 --bg: #0B0F19;
+                --bg-elev: #101627;
                 --card-bg: #131B2E;
                 --text-main: #F1F5F9;
                 --text-muted: #94A3B8;
-                --border: #1E293B;
-                --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+                --border: #1F2A44;
+                --border-soft: #182036;
+                --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+                --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+                --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+                --shadow-glow: 0 20px 40px -12px rgba(129, 140, 248, 0.3);
             }
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 16px); }
+
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
+            background: var(--bg);
+            background-image:
+                radial-gradient(1200px 600px at 10% -10%, rgba(79, 70, 229, 0.12), transparent 60%),
+                radial-gradient(900px 500px at 100% 0%, rgba(6, 182, 212, 0.10), transparent 60%);
+            background-attachment: fixed;
             color: var(--text-main);
             line-height: 1.7;
-            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
-        .container { max-width: 960px; margin: 0 auto; }
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-image:
+                    radial-gradient(1200px 600px at 10% -10%, rgba(129, 140, 248, 0.18), transparent 60%),
+                    radial-gradient(900px 500px at 100% 0%, rgba(34, 211, 238, 0.10), transparent 60%);
+            }
+        }
 
-        header { text-align: center; margin-bottom: 48px; }
+        /* ---------- Nav ---------- */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            height: var(--nav-h);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: color-mix(in oklab, var(--bg-elev) 78%, transparent);
+            backdrop-filter: saturate(160%) blur(14px);
+            -webkit-backdrop-filter: saturate(160%) blur(14px);
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .nav-inner {
+            max-width: 1080px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .nav-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            color: var(--text-main);
+            text-decoration: none;
+            letter-spacing: -0.2px;
+        }
+
+        .nav-brand img {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-links { display: flex; align-items: center; gap: 8px; }
+
+        .nav-link {
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: color .2s var(--ease), background .2s var(--ease);
+        }
+        .nav-link:hover { color: var(--text-main); background: var(--primary-light); }
+
+        .nav-cta {
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            font-size: 13px;
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+            transition: transform .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease);
+        }
+        .nav-cta:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-glow); }
+
+        /* ---------- Layout ---------- */
+        .container { max-width: 1080px; margin: 0 auto; padding: 40px 20px 60px; }
+
+        /* ---------- Hero ---------- */
+        header.hero { text-align: center; margin-bottom: 56px; }
 
         .hero-banner {
             display: block;
             width: 100%;
             max-width: 1024px;
-            margin: 0 auto 40px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            margin: 0 auto 32px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(0);
+            transition: transform .5s var(--ease), box-shadow .5s var(--ease);
+        }
+        .hero-banner:hover { transform: translateY(-3px); box-shadow: var(--shadow-glow), var(--shadow-lg); }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 18px;
+        }
+        .eyebrow .dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15); animation: pulse 2.4s var(--ease) infinite; }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.35); }
+            50%      { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.08); }
         }
 
         h1 {
-            font-size: 40px;
+            font-size: clamp(34px, 5.4vw, 52px);
             font-weight: 800;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.8px;
+            line-height: 1.1;
             color: var(--text-main);
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+        }
+        h1 .grad {
+            background: linear-gradient(120deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         .tagline {
-            font-size: 18px;
+            font-size: clamp(15px, 2vw, 18px);
             color: var(--text-muted);
-            max-width: 640px;
-            margin: 0 auto 24px;
+            max-width: 680px;
+            margin: 0 auto 26px;
         }
 
-        .badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+        .badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 28px; }
 
         .badge {
             display: inline-flex;
@@ -94,11 +232,39 @@
             font-size: 13px;
             font-weight: 600;
             color: var(--text-main);
+            box-shadow: var(--shadow-sm);
+            transition: transform .2s var(--ease), box-shadow .2s var(--ease);
         }
-
+        .badge:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
         .badge.green { color: var(--success); }
         .badge.indigo { color: var(--primary); }
 
+        .hero-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+
+        /* ---------- Buttons ---------- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 22px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            text-decoration: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: transform .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease), color .2s var(--ease);
+            will-change: transform;
+        }
+
+        .btn-primary { background: var(--primary); color: #FFFFFF; box-shadow: var(--shadow-sm); }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+        .btn-outline { background: transparent; color: var(--primary); border-color: var(--primary); }
+        .btn-outline:hover { background: var(--primary-light); transform: translateY(-2px); }
+
+        .btn svg { width: 18px; height: 18px; }
+
+        /* ---------- Cards ---------- */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -108,190 +274,339 @@
             box-shadow: var(--shadow);
         }
 
-        h2 {
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 16px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            margin-bottom: 20px;
             color: var(--text-main);
         }
 
-        p { margin-bottom: 14px; color: var(--text-main); font-size: 15px; }
-
-        .hero-box {
-            background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%);
-            border: 1px solid rgba(79, 70, 229, 0.2);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 24px;
+        .section-title .kicker {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 18px;
         }
 
+        p { margin-bottom: 14px; color: var(--text-main); font-size: 15px; }
+        p:last-child { margin-bottom: 0; }
+
+        .hero-box {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.10) 0%, rgba(6, 182, 212, 0.10) 100%);
+            border: 1px solid rgba(79, 70, 229, 0.22);
+            border-radius: var(--radius);
+            padding: 26px;
+            margin-bottom: 28px;
+        }
+        @media (prefers-color-scheme: dark) {
+            .hero-box { border-color: rgba(129, 140, 248, 0.28); }
+        }
+
+        /* ---------- Features ---------- */
         .features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 16px;
-            margin-bottom: 8px;
         }
 
         .feature {
+            position: relative;
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 20px;
+            padding: 22px;
+            transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease);
         }
-
-        .feature h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--primary); }
+        .feature:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
+        }
+        .feature .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(6, 182, 212, 0.12));
+            color: var(--primary);
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+        .feature h3 { font-size: 16px; font-weight: 800; margin-bottom: 6px; color: var(--text-main); letter-spacing: -0.2px; }
         .feature p { font-size: 14px; color: var(--text-muted); margin: 0; }
 
+        /* ---------- Steps ---------- */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            counter-reset: step;
+        }
+        .step {
+            position: relative;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 22px 22px 68px;
+            transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+        }
+        .step:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+        .step::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 18px;
+            top: 18px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: #fff;
+            font-weight: 800;
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .step h3 { font-size: 15px; font-weight: 800; margin-bottom: 4px; color: var(--text-main); }
+        .step p { font-size: 14px; color: var(--text-muted); margin: 0; }
+
+        /* ---------- Screenshots ---------- */
         .screenshots {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 16px;
         }
 
         .screenshot {
-            background: #0F172A;
+            background: linear-gradient(180deg, #0B1220, #0F172A);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             overflow: hidden;
             box-shadow: var(--shadow);
+            transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+        }
+        .screenshot:hover {
+            transform: translateY(-4px) scale(1.015);
+            box-shadow: var(--shadow-lg);
         }
 
+        .screenshot .thumb {
+            display: block;
+            width: 100%;
+            overflow: hidden;
+        }
         .screenshot img {
             width: 100%;
             display: block;
             aspect-ratio: 9 / 16;
             object-fit: contain;
+            transition: transform .5s var(--ease);
         }
-        .screenshot p { font-size: 12px; color: var(--text-muted); text-align: center; padding: 8px; margin: 0; }
-
-        .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 22px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 15px;
-            text-decoration: none;
-            border: 1px solid transparent;
-            cursor: pointer;
+        .screenshot:hover img { transform: scale(1.03); }
+        .screenshot p {
+            font-size: 12px;
+            color: #E2E8F0;
+            text-align: center;
+            padding: 10px 8px;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 0.2px;
         }
 
-        .btn-primary { background: var(--primary); color: #FFFFFF; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-outline { background: transparent; color: var(--primary); border-color: var(--primary); }
-        .btn-outline:hover { background: var(--primary-light); }
+        /* ---------- Lists ---------- */
+        ul { padding-left: 20px; margin-bottom: 8px; }
+        li { margin-bottom: 8px; font-size: 15px; }
+        li::marker { color: var(--primary); }
+
+        code {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.88em;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
 
         .download-notes { font-size: 13px; color: var(--text-muted); margin-top: 12px; }
 
-        ul { padding-left: 20px; margin-bottom: 16px; }
-        li { margin-bottom: 8px; font-size: 15px; }
-
+        /* ---------- Footer ---------- */
         footer {
             text-align: center;
-            margin-top: 48px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
+            margin-top: 56px;
+            padding: 28px 20px;
+            border-top: 1px solid var(--border-soft);
             color: var(--text-muted);
             font-size: 13px;
         }
-
         footer a { color: var(--primary); text-decoration: none; }
         footer a:hover { text-decoration: underline; }
+
+        /* ---------- Reveal on scroll ---------- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity .7s var(--ease), transform .7s var(--ease);
+            will-change: transform, opacity;
+        }
+        .reveal.in { opacity: 1; transform: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+            .reveal { opacity: 1; transform: none; }
+        }
+
+        @media (max-width: 560px) {
+            .nav { padding: 0 14px; }
+            .container { padding: 24px 16px 40px; }
+            .card { padding: 22px; }
+            .nav-link { display: none; }
+            .nav-cta { padding: 8px 12px; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <img class="hero-banner" src="./feature_graphic_1024x500.png" alt="ImageToPdf Free — Studio Quality, Private by Design">
-        <header>
-            <h1>Image to PDF</h1>
-            <p class="tagline">Turn photos, receipts, and scans into crisp, crystal-clear PDF documents — entirely on your device. No internet, no ads, no tracking.</p>
-            <div class="badges">
+    <nav class="nav" aria-label="Primary">
+        <div class="nav-inner">
+            <a class="nav-brand" href="#top" aria-label="Image to PDF — home">
+                <img src="assets/icon_512.png" alt="" aria-hidden="true">
+                <span>Image&nbsp;to&nbsp;PDF</span>
+            </a>
+            <div class="nav-links">
+                <a class="nav-link" href="#features">Features</a>
+                <a class="nav-link" href="#how">How it works</a>
+                <a class="nav-link" href="#privacy">Privacy</a>
+                <a class="nav-cta" href="#download">Download</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" id="top">
+        <header class="hero reveal">
+            <img class="hero-banner" src="./feature_graphic_1024x500.png" alt="Image to PDF — Studio Quality, Private by Design">
+            <span class="eyebrow"><span class="dot" aria-hidden="true"></span> Studio quality · Private by design</span>
+            <h1>Turn photos into <span class="grad">crystal-clear PDFs</span> — offline.</h1>
+            <p class="tagline">Scan receipts, notes, and paper documents into professional PDF files entirely on your Android device. No internet, no ads, no tracking — ever.</p>
+            <div class="badges" aria-label="Highlights">
                 <span class="badge indigo">Android 7.0+ (API 24)</span>
                 <span class="badge indigo">Jetpack Compose · Material 3</span>
                 <span class="badge green">100% Offline</span>
                 <span class="badge green">Zero Network</span>
                 <span class="badge">A4 · Letter · Fit to Image</span>
             </div>
+            <div class="hero-cta">
+                <a class="btn btn-primary" href="#download">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+                    Download the app
+                </a>
+                <a class="btn btn-outline" href="#features">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    See features
+                </a>
+            </div>
         </header>
 
-        <div class="hero-box">
-            <h2 style="margin-top:0;">💡 What is Image to PDF?</h2>
-            <p><strong>Image to PDF</strong> is a modern, high-performance Android application that converts single or multi-page photos into PDF documents directly on your device. Everything — filtering, rotation, reordering, watermarking, and PDF rendering — happens locally in memory. The app <strong>does not declare the internet permission</strong>, so it cannot send your data anywhere, even in principle.</p>
+        <div class="hero-box reveal">
+            <h2 class="section-title" style="margin-bottom:10px;">
+                <span class="kicker" aria-hidden="true">💡</span> What is Image to PDF?
+            </h2>
+            <p><strong>Image to PDF</strong> is a modern, high-performance Android application that turns single or multi-page photos into PDF documents directly on your device. Everything — filtering, rotation, reordering, watermarking, and PDF rendering — happens locally in memory. The app <strong>does not declare the internet permission</strong>, so it cannot send your data anywhere, even in principle.</p>
         </div>
 
-        <div class="card">
-            <h2>✨ Features</h2>
+        <div class="card reveal" id="features">
+            <div class="section-title">
+                <span class="kicker" aria-hidden="true">✨</span> Features
+            </div>
             <div class="features">
                 <div class="feature">
-                    <h3>📸 Easy Ingestion</h3>
+                    <div class="icon" aria-hidden="true">📸</div>
+                    <h3>Easy Ingestion</h3>
                     <p>Multi-image Photo Picker, in-app camera capture, and batch selection from dozens of images at once.</p>
                 </div>
                 <div class="feature">
-                    <h3>💎 Lossless Rendering</h3>
+                    <div class="icon" aria-hidden="true">💎</div>
+                    <h3>Lossless Rendering</h3>
                     <p>Zero lossy downscaling. Quality presets: Ultra HD (100%), Balanced (85%), and Compact (65%).</p>
                 </div>
                 <div class="feature">
-                    <h3>🎨 Document Filters</h3>
-                    <p>Original, B&W Clean, Grayscale, Magic Color, and Sepia — with pinch-to-zoom, pan, and fit/fill crop.</p>
+                    <div class="icon" aria-hidden="true">🎨</div>
+                    <h3>Document Filters</h3>
+                    <p>Original, B&amp;W Clean, Grayscale, Magic Color, and Sepia — with pinch-to-zoom, pan, and fit/fill crop.</p>
                 </div>
                 <div class="feature">
-                    <h3>📐 Page Layout</h3>
+                    <div class="icon" aria-hidden="true">📐</div>
+                    <h3>Page Layout</h3>
                     <p>A4, US Letter, or exact Fit-to-Image sizes with Portrait, Landscape, and Auto orientation plus adjustable margins.</p>
                 </div>
                 <div class="feature">
-                    <h3>🛡️ Watermark Stamps</h3>
+                    <div class="icon" aria-hidden="true">🛡️</div>
+                    <h3>Watermark Stamps</h3>
                     <p>Native canvas-rendered CONFIDENTIAL, DRAFT, and custom stamps in diagonal (45°) or horizontal alignment.</p>
                 </div>
                 <div class="feature">
-                    <h3>🖨️ Export & Print</h3>
+                    <div class="icon" aria-hidden="true">🖨️</div>
+                    <h3>Export &amp; Print</h3>
                     <p>Save to Downloads, native Android printing, sharing, and an offline searchable document history.</p>
                 </div>
             </div>
         </div>
 
-        <div class="card">
-            <h2>📱 In Action</h2>
-            <div class="screenshots">
-                <div class="screenshot">
-                    <img src="assets/screenshots/splash_screen.png" alt="Animated splash screen">
-                    <p>Splash — studio branding</p>
+        <div class="card reveal" id="how">
+            <div class="section-title">
+                <span class="kicker" aria-hidden="true">⚡</span> How it works
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <h3>Add pages</h3>
+                    <p>Snap with the in-app camera or pick photos from the system Photo Picker.</p>
                 </div>
-                <div class="screenshot">
-                    <img src="assets/screenshots/home_screen.png" alt="Home screen">
-                    <p>Home — start a new document</p>
+                <div class="step">
+                    <h3>Enhance &amp; reorder</h3>
+                    <p>Rotate, crop, apply B&amp;W or Magic Color, then drag to arrange the sequence.</p>
                 </div>
-                <div class="screenshot">
-                    <img src="assets/screenshots/selected_screen.png" alt="Selected images in the staging grid">
-                    <p>Staging — batch-selected pages</p>
+                <div class="step">
+                    <h3>Configure PDF</h3>
+                    <p>Choose page size, orientation, margins, quality preset, and optional watermark.</p>
                 </div>
-                <div class="screenshot">
-                    <img src="assets/screenshots/preview_and_adjust.png" alt="Page preview and adjustment controls">
-                    <p>Preview — zoom, pan & rotate</p>
-                </div>
-                <div class="screenshot">
-                    <img src="assets/screenshots/filters.png" alt="Document filter sheet">
-                    <p>Filters — B&W, Sepia & more</p>
-                </div>
-                <div class="screenshot">
-                    <img src="assets/screenshots/pdf_save_options.png" alt="PDF export options">
-                    <p>Export — watermark, size & quality</p>
-                </div>
-                <div class="screenshot">
-                    <img src="assets/screenshots/saved_popup.png" alt="PDF saved confirmation">
-                    <p>Done — saved to Downloads</p>
-                </div>
-                <div class="screenshot">
-                    <img src="assets/screenshots/saved_history.png" alt="Document history screen">
-                    <p>History — offline search & sort</p>
+                <div class="step">
+                    <h3>Export</h3>
+                    <p>Save to Downloads, share, or print — all directly on device.</p>
                 </div>
             </div>
         </div>
 
-        <div class="card">
-            <h2>🔒 Privacy & Security</h2>
+        <div class="card reveal">
+            <div class="section-title">
+                <span class="kicker" aria-hidden="true">📱</span> In action
+            </div>
+            <div class="screenshots">
+                <div class="screenshot"><div class="thumb"><img src="assets/screenshots/splash_screen.png" alt="Animated splash screen" loading="lazy"></div><p>Splash — studio branding</p></div>
+                <div class="screenshot"><div class="thumb"><img src="assets/screenshots/home_screen.png" alt="Home screen" loading="lazy"></div><p>Home — start a new document</p></div>
+                <div class="screenshot"><div class="thumb"><img src="assets/screenshots/selected_screen.png" alt="Selected images in the staging grid" loading="lazy"></div><p>Staging — batch-selected pages</p></div>
+                <div class="screenshot"><div class="thumb"><img src="assets/screenshots/preview_and_adjust.png" alt="Page preview and adjustment controls" loading="lazy"></div><p>Preview — zoom, pan &amp; rotate</p></div>
+                <div class="screenshot"><div class="thumb"><img src="assets/screenshots/filters.png" alt="Document filter sheet" loading="lazy"></div><p>Filters — B&amp;W, Sepia &amp; more</p></div>
+                <div class="screenshot"><div class="thumb"><img src="assets/screenshots/pdf_save_options.png" alt="PDF export options" loading="lazy"></div><p>Export — watermark, size &amp; quality</p></div>
+                <div class="screenshot"><div class="thumb"><img src="assets/screenshots/saved_popup.png" alt="PDF saved confirmation" loading="lazy"></div><p>Done — saved to Downloads</p></div>
+                <div class="screenshot"><div class="thumb"><img src="assets/screenshots/saved_history.png" alt="Document history screen" loading="lazy"></div><p>History — offline search &amp; sort</p></div>
+            </div>
+        </div>
+
+        <div class="card reveal" id="privacy">
+            <div class="section-title">
+                <span class="kicker" aria-hidden="true">🔒</span> Privacy &amp; Security
+            </div>
             <p>Image to PDF is engineered with an uncompromising privacy architecture:</p>
             <ul>
                 <li><strong>No Internet Access</strong> — the <code>android.permission.INTERNET</code> permission is not declared in the manifest, making remote communication physically impossible.</li>
@@ -302,16 +617,24 @@
             <p><a href="privacy_policy.html">Read the full Privacy Policy →</a></p>
         </div>
 
-        <div class="card">
-            <h2>⬇️ Get the App</h2>
+        <div class="card reveal" id="download">
+            <div class="section-title">
+                <span class="kicker" aria-hidden="true">⬇️</span> Get the app
+            </div>
             <p>No account required. Just install the APK and go — the app works fully offline from the first launch.</p>
             <!--
                 The download link below points to the "latest" release asset on GitHub,
                 so it stays current after every new release without editing this file.
             -->
-            <div class="cta-row">
-                <a class="btn btn-primary" href="https://github.com/thisisdarkstar/imageToPDF/releases/latest/download/ImageToPdfFree-v1.0.0-release.apk" target="_blank" rel="noopener">Download Release APK</a>
-                <a class="btn btn-outline" href="https://github.com/thisisdarkstar/imageToPDF" target="_blank" rel="noopener">View Source & Build Guide</a>
+            <div class="hero-cta" style="justify-content:flex-start;margin-top:6px;">
+                <a class="btn btn-primary" href="https://github.com/thisisdarkstar/imageToPDF/releases/latest/download/ImageToPdfFree-v1.0.0-release.apk" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+                    Download Release APK
+                </a>
+                <a class="btn btn-outline" href="https://github.com/thisisdarkstar/imageToPDF" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18c-4.51 2-5-2-7-2"/><path d="M15 22v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 19 5.77 5.07 5.07 0 0 0 18.91 2S17.73 1.65 15 3.48a13.38 13.38 0 0 0-7 0C5.27 1.65 4.09 2 4.09 2A5.07 5.07 0 0 0 4 5.77a5.44 5.44 0 0 0-1.5 3.75c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 8 19.13V22"/></svg>
+                    View Source &amp; Build Guide
+                </a>
             </div>
             <p class="download-notes">
                 Prefer to build it yourself? Follow the build guide in the repository's <strong>README</strong>
@@ -320,8 +643,28 @@
         </div>
 
         <footer>
-            <p>© 2026 Image to PDF. All rights reserved. · <a href="privacy_policy.html">Privacy Policy</a> · Licensed under Apache 2.0</p>
+            <p>© 2026 Image to PDF · <a href="privacy_policy.html">Privacy Policy</a> · Licensed under Apache 2.0</p>
         </footer>
     </div>
+
+    <script>
+        // Progressive-enhancement: reveal-on-scroll (guarded for reduced motion & older browsers)
+        (function () {
+            var mq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+            if (!('IntersectionObserver' in window) || (mq && mq.matches)) {
+                document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+                return;
+            }
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('in');
+                        io.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+            document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+        })();
+    </script>
 </body>
 </html>
