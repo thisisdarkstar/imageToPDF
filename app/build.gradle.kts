@@ -21,7 +21,7 @@ android {
         applicationId = "io.github.thisisdarkstar.imagetopdf"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0.0"
     }
 
@@ -47,6 +47,12 @@ android {
             signingConfig = signingConfigs.getByName(
                 if (hasReleaseSigning) "release" else "debug"
             )
+            // Bundle native debug symbols so Play Console Vitals can symbolicate
+            // native crashes (function names + line numbers instead of raw addresses).
+            // SYMBOL_TABLE ≈ +150–300 KB; FULL ≈ +500 KB–2 MB.
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
     }
 
